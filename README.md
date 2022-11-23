@@ -19,3 +19,7 @@ python main.py
 # Methodology
 
 # Visualizations
+
+'''
+![plot](./code/test.png)
+'''
