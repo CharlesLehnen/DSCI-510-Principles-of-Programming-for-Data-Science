@@ -7,11 +7,11 @@ url = "https://www.youtube.com/watch?v=ydYDqZQpim8"
 first, second = url.split('=')
 
 # Use youtube-dl to extract the streaming URL of the video
-os.system(f"youtube-dl -g -f worst {url} > stream-url")
+output = subprocess.run(["youtube-dl", "-g", "-f", "worst", url], capture_output=True)
 
-# Read the contents of the stream-url file using subprocess
-with open("stream-url", "r") as f:
-    stream_url_contents = f.read()
+# Save the streaming URL to a file
+with open("stream-url", "w") as f:
+    f.write(output.stdout.decode("utf-8"))
 
 # Set the time interval (in seconds) for image extraction
 interval = 10
@@ -25,10 +25,10 @@ if not os.path.exists(folder_name):
 
 while True:
     # Generate timestamp for image naming
-    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S", time.gmtime())
+    timestamp = time.strftime("%Y%m%d_%H%M%S", time.gmtime())
 
     # Use ffmpeg to try to extract images at set intervals
-    os.system(f"ffmpeg -i {stream_url_contents} -vcodec copy {folder_name}/img22_{timestamp}.jpeg")
+    os.system(f"ffmpeg -i {stream_url_contents} -vcodec copy {folder_name}/img_{timestamp}.jpeg")
 
     # Sleep between extractions
     time.sleep(interval)
