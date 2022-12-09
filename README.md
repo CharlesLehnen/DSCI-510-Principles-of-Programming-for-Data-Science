@@ -20,6 +20,4 @@ python main.py
 
 # Visualizations
 
-'''
 ![plot](./code/test.png)
-'''
