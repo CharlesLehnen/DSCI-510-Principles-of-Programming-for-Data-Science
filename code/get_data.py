@@ -4,6 +4,7 @@ import requests
 import time
 import subprocess
 
+
 # Set URL of YouTube live video
 url = "https://www.youtube.com/watch?v=ydYDqZQpim8"
 first, second = url.split('=')
@@ -29,7 +30,8 @@ max_iterations = 3
 
 while counter < max_iterations :
     # Use subprocess.run() to run the youtube-dl command in the CL and assign its output to a variable
-    output = subprocess.run(["youtube-dl", "--write-info-json", "--output", "%(id)s.info.json", url], capture_output=True)
+    output = subprocess.run(["youtube-dl", "--write-info-json", "--output", os.path.join(metadata_folder, "%(id)s.info.json"), url], capture_output=True)
+
 
     # Check to see if worked or not
     if output.returncode != 0:
@@ -47,7 +49,7 @@ while counter < max_iterations :
 for filename in os.listdir(metadata_folder):
     
     # Open the metadata
-    with open(os.path.join(metadata_folder, filename)) as f:
+    with open(os.path.join(metadata_folder, filename), encoding="utf-8") as f:
         metadata = json.load(f)
     print("Downloading image from {}".format(metadata["thumbnail"]["url"]))
         
