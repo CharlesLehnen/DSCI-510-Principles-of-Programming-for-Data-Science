@@ -10,12 +10,8 @@ first, second = url.split('=')
 # Use youtube-dl to extract the streaming URL of the video
 url_output = subprocess.run(["youtube-dl", "-g", "-f", "worst", url], capture_output=True)
 
-# Save the streaming URL to a file
-with open("stream-url", "w") as f:
-    f.write(url_output.stdout.decode("utf-8"))
-
 # Set the time interval (in seconds) for image extraction
-interval = 5
+interval = 100
 
 # Set the name of the folder for images
 folder_name = "images" + "_" + second
@@ -26,7 +22,7 @@ if not os.path.exists(folder_name):
     
 while True:
     # Use subprocess.run to try to run the ffmpeg command in the CL
-    subprocess.run(["ffmpeg", "-i", url_output.stdout.decode('utf-8'), "-f", "image2", f"{folder_name}/img_%03d.jpeg"])
+    subprocess.run(["ffmpeg", "-i", url_output.stdout.decode('utf-8'), "-f", "image2", "-s", "640x480", f"{folder_name}/img_%03d.jpeg"])
     
     # Sleep between extractions
     time.sleep(interval)
