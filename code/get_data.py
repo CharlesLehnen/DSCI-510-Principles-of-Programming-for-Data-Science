@@ -1,6 +1,7 @@
 import os
 import time
 import subprocess
+from datetime import datetime
 
 # Set URL of YouTube live video
 url = "https://www.youtube.com/watch?v=ydYDqZQpim8"
@@ -24,11 +25,12 @@ if not os.path.exists(folder_name):
     os.makedirs(folder_name)
 
 while True:
+    
     # Generate timestamp for image naming
-    timestamp = time.strftime("%Y%m%d_%H%M%S", time.gmtime())
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
 
-    # Use ffmpeg to try to extract images at set intervals
-    os.system(f"ffmpeg -i {stream_url_contents} -vcodec copy {folder_name}/img_{timestamp}.jpeg")
+    # Use ffmpeg to try to extract images at the set intervals
+    os.system(f"ffmpeg -i {output.stdout.decode('utf-8')} -vcodec copy {folder_name}/img_{timestamp}.jpeg")
 
     # Sleep between extractions
     time.sleep(interval)
