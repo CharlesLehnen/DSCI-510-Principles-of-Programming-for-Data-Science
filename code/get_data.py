@@ -28,7 +28,7 @@ while True:
     timestamp = time.strftime("%Y-%m-%d_%H-%M-%S", time.gmtime())
 
     # Use ffmpeg to try to extract images at set intervals
-    os.system(f"ffmpeg -i {stream_url_contents} -f image2 -frames:v 1 {folder_name}/img22_{timestamp}.jpeg")
+    os.system(f"ffmpeg -i {stream_url_contents} -vcodec png -frames:v 1 {folder_name}/img22_{timestamp}.jpeg")
 
     # Sleep between extractions
     time.sleep(interval)
