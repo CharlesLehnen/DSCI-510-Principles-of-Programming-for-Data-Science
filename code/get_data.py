@@ -11,8 +11,7 @@ from pytube import YouTube
 
 INTERVAL = 15
 MAX_RUNTIME = 3
-VIDEO_LENGTH = 10
-
+VIDEO_LENGTH = 5
 
 
 # Set URL of YouTube live video and names
@@ -24,37 +23,57 @@ video_id = second
 # Set up folder structure
 
 ## Set the video and image folders
-video_filename = second + ".mp4"
-
-video_folder = os.path.join(os.getcwd(), "data", "videos", f"{video_id}.mp4")
+video_folder = os.path.join("data", "videos")
 if not os.path.exists(video_folder):
     os.mkdir(video_folder)
 
-image_folder = os.path.join(os.getcwd(), "data", "images", f"{video_id}.mp4")
+image_folder = os.path.join("data", "images")
 if not os.path.exists(image_folder):
     os.mkdir(image_folder)
    
     
 # Download video
 
-# Get the YouTube video object
-video = YouTube(url)
-
-# Set to live mode
-video.streams.filter(progressive=True, file_extension='mp4').first().download(video_folder)
-
-# Wait for the desired length of the video
-time.sleep(VIDEO_LENGTH)
-
-# Stop the video
-video.stop()
 
 
+# Set the path to the output video file
+output_file = os.path.join(video_folder, f"video_{video_id}_trimmed.mp4")
+
+# Set the maximum duration of the video in seconds
+max_time = 74
+
+# Download the video using youtube-dl and pipe the output to ffmpeg
+command = [
+    "youtube-dl",
+    url,
+    "--format", "mp4",
+    "|",
+    "ffmpeg",
+    "-i", "-",
+    "-t", str(max_time),
+    output_file
+]
+
+subprocess.run(command)
+
+
+'''
+
+#this worked some of the time, otherwise export mp4.part
+video_output = os.path.join(os.getcwd(), "data", "videos")
+
+command = [
+    "youtube-dl",
+    "--output", f"{video_output}/video_%(id)s.%(ext)s",
+    url
+]
+
+# Download the video using youtube-dl
+subprocess.run(command, timeout = VIDEO_LENGTH)
 
 
 print("done with stream step")
 
-'''
 
 #might need to do this, but will download to my local machine which is clunkier
 #output = youtube_dl.YoutubeDL({"format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"}).extract_info(url, download=True)
