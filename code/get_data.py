@@ -19,8 +19,11 @@ if not os.path.exists(folder_name):
     os.makedirs(folder_name)
 
 while True:
+    # Generate timestamp for image
+    timestamp = time.strftime("%Y-%m-%d_%H-%M-%S", time.gmtime())
+
     # Use ffmpeg to try to extract images at set intervals
-    os.system(f"ffmpeg -i $(cat stream-url) -f image2 -frames:v 1 {folder_name}/img22.jpeg")
+    os.system(f"ffmpeg -i $(cat stream-url) -f image2 -frames:v 1 {folder_name}/img22_{timestamp}.jpeg")
 
     # Sleep between extractions
     time.sleep(interval)
