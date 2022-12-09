@@ -20,16 +20,18 @@ first, second = url.split('=')
 # Set the video folder
 video_folder = "videos" + "_" + second
 if not os.path.exists(video_folder):
-    subprocess.run("mkdir", video_folder)
+    #subprocess.run("mkdir " + video_folder)
+    #subprocess.run("mkdir", video_folder)
     #subprocess.run(["C:\\Windows\\System32\\cmd.exe", "/c", "mkdir", video_folder])
-    #os.mkdir(video_folder)
+    os.mkdir(video_folder)
 
 # Set the image folder
 image_folder = "images" + "_" + second
 if not os.path.exists(image_folder):
-    subprocess.run("mkdir", image_folder)
+    #subprocess.run("mkdir " + video_folder)
+    #subprocess.run("mkdir", image_folder)
     #subprocess.run(["C:\\Windows\\System32\\cmd.exe", "/c", "mkdir", image_folder])
-    #os.mkdir(image_folder)
+    os.mkdir(image_folder)
 
 
 # Download video
