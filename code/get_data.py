@@ -8,10 +8,8 @@ import re
 
 # SET PARAMETERS
 
-## Max number of screencaptures
-max_iterations = 3
 ## Interval between screencaptures (seconds)
-interval = 2
+interval = 15
 
 
 
