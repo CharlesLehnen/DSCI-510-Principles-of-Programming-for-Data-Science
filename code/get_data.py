@@ -23,17 +23,17 @@ folder_name = "images" + "_" + second
 # Create new folder if does not exist
 if not os.path.exists(folder_name):
     os.makedirs(folder_name)
-
-while True:
     
-    # Generate timestamp for image naming
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-
+while True:
     # Use subprocess.run to try to run the ffmpeg command in the CL
-    subprocess.run(["ffmpeg", "-i", url_output.stdout.decode('utf-8'), "-vcodec", "copy", f"{folder_name}/img_{timestamp}.jpeg"])
-
+    subprocess.run(["ffmpeg", "-i", url_output.stdout.decode('utf-8'), "-vcodec", "copy", f"{folder_name}/img_%03d.jpeg"])
+    
     # Sleep between extractions
     time.sleep(interval)
+
+
+
+    
     
     
     
