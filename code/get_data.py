@@ -5,73 +5,50 @@ import cv2
 import ffmpeg
 import youtube_dl
 import io
+from pytube import YouTube
 
 # SET PARAMETERS
 
 INTERVAL = 15
 MAX_RUNTIME = 3
+VIDEO_LENGTH = 10
 
 
 
 # Set URL of YouTube live video and names
 url = "https://www.youtube.com/watch?v=ydYDqZQpim8"
 first, second = url.split('=')
-
+video_id = second
 
 
 # Set up folder structure
 
 ## Set the video and image folders
-video_folder = os.path.join("data", "videos" + "_" + second)
+video_filename = second + ".mp4"
+
+video_folder = os.path.join(os.getcwd(), "data", "videos", f"{video_id}.mp4")
 if not os.path.exists(video_folder):
     os.mkdir(video_folder)
 
-image_folder = os.path.join("data", "images" + "_" + second)
+image_folder = os.path.join(os.getcwd(), "data", "images", f"{video_id}.mp4")
 if not os.path.exists(image_folder):
     os.mkdir(image_folder)
-    
-## Debug
-if os.path.exists(video_folder):
-    print("Video folder created: {}".format(video_folder))
-else:
-    print("Error creating video folder: {}".format(video_folder))
-
-if os.path.exists(image_folder):
-    print("Image folder created: {}".format(image_folder))
-else:
-    print("Error creating image folder: {}".format(image_folder))
-
-
-
-#help(youtube_dl.YoutubeDL)
+   
     
 # Download video
 
-ydl_opts = {
-    "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
-    "outtmpl": os.path.join(video_folder, "%(title)s.%(ext)s"),
-    "noplaylist": True,
-    "timeout": 3,  # Set timeout to 3 seconds
-}
+# Get the YouTube video object
+video = YouTube(url)
 
-ydl = youtube_dl.YoutubeDL(ydl_opts)
+# Set to live mode
+video.streams.filter(progressive=True, file_extension='mp4').first().download(video_folder)
 
-try:
-    # Download video using youtube-dl
-    ydl.download([url])
-except:
-    # Handle error if download times out
-    print("Download timed out after {} seconds".format(ydl_opts["timeout"]))
+# Wait for the desired length of the video
+time.sleep(VIDEO_LENGTH)
 
+# Stop the video
+video.stop()
 
-# ydl_opts = {
-#     'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-#     'timeout': 3
-# }
-
-# stream = youtube_dl.YoutubeDL(ydl_opts).extract_info(url)
-
-#stream = youtube_dl.YoutubeDL({"format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"}).extract_info(url, download=False, timeout=3)
 
 
 
