@@ -17,7 +17,7 @@ if not os.path.exists(folder_name):
 
 while True:
     # Use ffmpeg to try to extract images at set intervals
-    os.system(f"ffmpeg -i {url} -vf fps=1/{interval} -vframes 1 {folder_name}/image.jpg")
+    os.system(f"ffmpeg -i {url} -vf fps=1/{interval} -vframes 1 {folder_name}/image%d.jpg")
 
     # Sleep between extractions
     time.sleep(interval)
