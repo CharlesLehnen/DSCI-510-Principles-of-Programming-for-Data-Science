@@ -19,10 +19,17 @@ folder_name = "images" + "_" + second
 if not os.path.exists(folder_name):
     subprocess.run(["mkdir", folder_name])
     
+counter = 0
+    
 while True:
     # Use subprocess.run to try to run the ffmpeg command in the CL
     # Chose 75kb because want the images a certain size for training/validating classifier
-    subprocess.run(["ffmpeg", "-i", url_output.stdout.decode('utf-8'), "-vf", "scale=min(1280\,iw):min(960\,ih):force_original_aspect_ratio=decrease", "-fs", "75000", "-f", "image2", f"{folder_name}/img_%03d.jpeg"])
+    subprocess.run(["ffmpeg", "-i", url_output.stdout.decode('utf-8'), "-vf", "scale=min(1920\,iw):min(1080\,ih):force_original_aspect_ratio=decrease", "-qscale:v", "10", "-fs", "75000", "-f", "image2", f"{folder_name}/img_%03d.jpeg"])
+    
+    # Counter
+    counter += 1
+    if counter >= 2:
+        break
     
     # Sleep between extractions
     time.sleep(interval)
