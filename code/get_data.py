@@ -9,7 +9,7 @@ import io
 # SET PARAMETERS
 
 INTERVAL = 15
-MAX_RUNTIME = 20
+MAX_RUNTIME = 3
 
 
 
@@ -42,15 +42,42 @@ else:
     print("Error creating image folder: {}".format(image_folder))
 
 
+
+#help(youtube_dl.YoutubeDL)
     
 # Download video
 
+ydl_opts = {
+    "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+    "outtmpl": os.path.join(video_folder, "%(title)s.%(ext)s"),
+    "noplaylist": True,
+    "timeout": 3,  # Set timeout to 3 seconds
+}
+
+ydl = youtube_dl.YoutubeDL(ydl_opts)
+
 try:
-    stream = youtube_dl.YoutubeDL({"format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best", "timeout": 10}).extract_info(url)
-except youtube_dl.utils.DownloadError:
-    print("Failed to download video information in the allotted time.")
+    # Download video using youtube-dl
+    ydl.download([url])
+except:
+    # Handle error if download times out
+    print("Download timed out after {} seconds".format(ydl_opts["timeout"]))
+
+
+# ydl_opts = {
+#     'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+#     'timeout': 3
+# }
+
+# stream = youtube_dl.YoutubeDL(ydl_opts).extract_info(url)
+
+#stream = youtube_dl.YoutubeDL({"format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"}).extract_info(url, download=False, timeout=3)
+
+
 
 print("done with stream step")
+
+'''
 
 #might need to do this, but will download to my local machine which is clunkier
 #output = youtube_dl.YoutubeDL({"format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"}).extract_info(url, download=True)
@@ -77,7 +104,6 @@ print("done with buffer step")
 video_stream = cap.get(cv2.CAP_PROP_POS_AVI_RATIO)
 print("done with video_stream step")
 
-'''
 
 # Capture frames from the stream
 
