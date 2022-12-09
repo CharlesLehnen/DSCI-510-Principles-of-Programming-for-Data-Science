@@ -26,7 +26,7 @@ if not os.path.exists(folder_name):
     
 while True:
     # Use subprocess.run to try to run the ffmpeg command in the CL
-    subprocess.run(["ffmpeg", "-i", url_output.stdout.decode('utf-8'), "-vcodec", "copy", f"{folder_name}/img_%03d.jpeg"])
+    subprocess.run(["ffmpeg", "-i", url_output.stdout.decode('utf-8'), "-f", "image2", f"{folder_name}/img_%03d.jpeg"])
     
     # Sleep between extractions
     time.sleep(interval)
