@@ -5,6 +5,9 @@ import time
 url = "https://www.youtube.com/watch?v=ydYDqZQpim8"
 first, second = url.split('=')
 
+# Use youtube-dl to extract the streaming URL of the video
+stream_url = os.system(f"youtube-dl -g -f worst {url} > stream-url")
+
 # Set the time interval (in seconds) for image extraction
 interval = 10
 
@@ -17,7 +20,7 @@ if not os.path.exists(folder_name):
 
 while True:
     # Use ffmpeg to try to extract images at set intervals
-    os.system(f"ffmpeg -i {url} -vf fps=1/{interval} -vframes 1 {folder_name}/image%d.jpg")
+    os.system(f"ffmpeg -i $(cat stream-url) -f image2 -frames:v 1 {folder_name}/img22.jpeg")
 
     # Sleep between extractions
     time.sleep(interval)
