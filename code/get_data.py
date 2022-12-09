@@ -17,37 +17,65 @@ url = "https://www.youtube.com/watch?v=ydYDqZQpim8"
 first, second = url.split('=')
 
 
-# Set the video folder
-video_folder = "videos" + "_" + second
+
+# Set up folder structure
+
+## Set the video and image folders
+video_folder = os.path.join("data", "videos" + "_" + second)
 if not os.path.exists(video_folder):
-    #subprocess.run("mkdir " + video_folder)
-    #subprocess.run("mkdir", video_folder)
-    #subprocess.run(["C:\\Windows\\System32\\cmd.exe", "/c", "mkdir", video_folder])
     os.mkdir(video_folder)
 
-# Set the image folder
-image_folder = "images" + "_" + second
+image_folder = os.path.join("data", "images" + "_" + second)
 if not os.path.exists(image_folder):
-    #subprocess.run("mkdir " + video_folder)
-    #subprocess.run("mkdir", image_folder)
-    #subprocess.run(["C:\\Windows\\System32\\cmd.exe", "/c", "mkdir", image_folder])
     os.mkdir(image_folder)
+    
+## Double-check folders
+if os.path.exists(video_folder):
+    print("Video folder created: {}".format(video_folder))
+else:
+    print("Error creating video folder: {}".format(video_folder))
 
+if os.path.exists(image_folder):
+    print("Image folder created: {}".format(image_folder))
+else:
+    print("Error creating image folder: {}".format(image_folder))
+    
+if len(os.listdir(video_folder)) > 0:
+    print("Video frames saved to: {}".format(video_folder))
+else:
+    print("Error saving video frames to: {}".format(video_folder))
+
+if len(os.listdir(image_folder)) > 0:
+    print("Images saved to: {}".format(image_folder))
+else:
+    print("Error saving images to: {}".format(image_folder))
+
+'''
 
 # Download video
 
-stream = youtube_dl.YoutubeDL({"format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"}).extract_info(
-    url, download=False
-)
+stream = youtube_dl.YoutubeDL({"format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"}).extract_info(url, download=False)
+
+#might need to do this, but will download to my local machine which is clunkier
+#output = youtube_dl.YoutubeDL({"format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"}).extract_info(url, download=True)
 
 ## Check to see if the download worked or not
-if stream.returncode != 0:
-    print("youtube-dl command failed with exit code {}".format(output.returncode))
+if 'returncode' in stream and stream['returncode'] != 0:
+    print("youtube-dl command failed with exit code {}".format(stream['returncode']))
     
 
 
 # Set up video capture using ffmpeg and cv2
-cap = cv2.VideoCapture(ffmpeg.input(stream["url"]))
+ffmpeg_command = "ffmpeg -i {} -acodec copy -vcodec copy -f mpegts pipe:".format(stream["url"])
+ffmpeg_process = subprocess.Popen(ffmpeg_command.split(), stdout=subprocess.PIPE)
+cap = cv2.VideoCapture(ffmpeg_process.stdout)
+
+# Debug
+print("Video capture object:")
+print(cap)
+ret, frame = cap.read()
+print("Frame data:")
+print(frame)
 
 # Capture video clips and extract images
 counter = 0
@@ -69,3 +97,5 @@ while cap.isOpened():
 
 # Stop video capture
 cap.release()
+
+'''
