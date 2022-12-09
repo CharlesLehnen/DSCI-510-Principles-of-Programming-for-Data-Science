@@ -40,19 +40,11 @@ if not os.path.exists(image_folder):
 output_file = os.path.join(video_folder, f"video_{video_id}_trimmed.mp4")
 
 # Set the maximum duration of the video in seconds
-max_time = 74
+max_time = 5
 
 # Download the video using youtube-dl and pipe the output to ffmpeg
-command = [
-    "youtube-dl",
-    url,
-    "--format", "mp4",
-    "|",
-    "ffmpeg",
-    "-i", "-",
-    "-t", str(max_time),
-    output_file
-]
+command = "youtube-dl -o {} --format mp4 {} | ffmpeg -i - -t {} {}".format(output_file, url, str(max_time), output_file)
+subprocess.run(command, shell=True)
 
 subprocess.run(command)
 
