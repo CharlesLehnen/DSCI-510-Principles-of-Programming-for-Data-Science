@@ -29,9 +29,9 @@ while True:
     # Generate timestamp for image naming
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
 
-    # Use ffmpeg to try to extract images at set intervals
-    #os.system(f"ffmpeg -i {url_output.stdout.decode('utf-8')} -vcodec copy {folder_name}/img_{timestamp}.jpeg")
-    
+    # Use subprocess.run to try to run the ffmpeg command in the CL
+    subprocess.run(["ffmpeg", "-i", url_output.stdout.decode('utf-8'), "-vcodec", "copy", f"{folder_name}/img_{timestamp}.jpeg"])
+
     # Sleep between extractions
     time.sleep(interval)
     
@@ -41,11 +41,11 @@ while True:
     
 
     
-    print(f"{url_output.stdout.decode('utf-8')}")
+    #print(f"{url_output.stdout.decode('utf-8')}")
     
-    print('"{url_output.stdout.decode('utf-8')}"'.format(url_output=url_output))
+    #print('"{url_output.stdout.decode('utf-8')}"'.format(url_output=url_output))
     
-    print('"{folder_name}/img_{timestamp}.jpeg"'.format(folder_name=folder_name, timestamp=timestamp))
+    #print('"{folder_name}/img_{timestamp}.jpeg"'.format(folder_name=folder_name, timestamp=timestamp))
     
     
     
