@@ -3,14 +3,16 @@ import os
 import requests
 import time
 import subprocess
-import ftfy
+import re
 
 
 # SET PARAMETERS
+
+## Max number of screencaptures
+max_iterations = 3
 ## Interval between screencaptures (seconds)
 interval = 2
-## Max number of iterations
-max_iterations = 3
+
 
 
 # Set URL of YouTube live video
@@ -60,7 +62,7 @@ for filename in os.listdir(metadata_folder):
         metadata_str = f.read()
 
     # Use ftfy to clean up the metadata string so it stops throwing errors
-    metadata_str = ftfy.fix_text(metadata_str)
+    metadata_str = re.sub(r'[^\x00-\x7f]', '?', metadata_str)
     metadata = json.loads(metadata_str)
 
     print("Downloading image from {}".format(metadata["thumbnail"]["url"]))
