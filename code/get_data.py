@@ -1,7 +1,6 @@
 import os
 import time
 import subprocess
-from datetime import datetime
 
 # Set URL of YouTube live video
 url = "https://www.youtube.com/watch?v=ydYDqZQpim8"
@@ -18,11 +17,12 @@ folder_name = "images" + "_" + second
 
 # Create new folder if does not exist
 if not os.path.exists(folder_name):
-    os.makedirs(folder_name)
+    subprocess.run(["mkdir", folder_name])
     
 while True:
     # Use subprocess.run to try to run the ffmpeg command in the CL
-    subprocess.run(["ffmpeg", "-i", url_output.stdout.decode('utf-8'), "-f", "image2", "-s", "640x480", f"{folder_name}/img_%03d.jpeg"])
+    # Chose 75kb because want the images a certain size for training/validating classifier
+    subprocess.run(["ffmpeg", "-i", url_output.stdout.decode('utf-8'), "-vf", "scale=min(1280\,iw):min(960\,ih):force_original_aspect_ratio=decrease", "-fs", "75000", "-f", "image2", f"{folder_name}/img_%03d.jpeg"])
     
     # Sleep between extractions
     time.sleep(interval)
