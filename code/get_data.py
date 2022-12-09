@@ -1,10 +1,9 @@
-import json
 import os
-import requests
 import time
 import subprocess
-import re
-
+import cv2
+import ffmpeg
+import youtube_dl
 
 # SET PARAMETERS
 
@@ -13,29 +12,58 @@ interval = 15
 
 
 
-# Set URL of YouTube live video
+# Set URL of YouTube live video and names
 url = "https://www.youtube.com/watch?v=ydYDqZQpim8"
 first, second = url.split('=')
 
-# Set name of video file
-video_file = "video.mp4" + "_" + second
+
+# Set the video folder
+video_folder = "videos" + "_" + second
+if not os.path.exists(video_folder):
+    subprocess.run("mkdir", video_folder)
+    #subprocess.run(["C:\\Windows\\System32\\cmd.exe", "/c", "mkdir", video_folder])
+    #os.mkdir(video_folder)
+
+# Set the image folder
+image_folder = "images" + "_" + second
+if not os.path.exists(image_folder):
+    subprocess.run("mkdir", image_folder)
+    #subprocess.run(["C:\\Windows\\System32\\cmd.exe", "/c", "mkdir", image_folder])
+    #os.mkdir(image_folder)
 
 
-# Download videos
+# Download video
 
-## Use subprocess.run() to run the youtube-dl command in the CL and assign its output to a variable
-output = subprocess.run(["youtube-dl", "-f", "mp4", "-o", video_file + "_%(format_id)s_%(segment_time)s.mp4", url], capture_output=True)
+stream = youtube_dl.YoutubeDL({"format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"}).extract_info(
+    url, download=False
+)
 
 ## Check to see if the download worked or not
-if output.returncode != 0:
+if stream.returncode != 0:
     print("youtube-dl command failed with exit code {}".format(output.returncode))
     
 
-# Combine videos
 
-## Use subprocess.run() to run the ffmpeg command in the CL to combine videos
-output = subprocess.run(["ffmpeg", "-i", video_file + "_%(format_id)s_%(segment_time)s.mp4", "-c", "copy", video_file], capture_output=True)
+# Set up video capture using ffmpeg and cv2
+cap = cv2.VideoCapture(ffmpeg.input(stream["url"]))
 
-# Check to see if the ffmpeg command worked or not
-if output.returncode != 0:
-    print("ffmpeg command failed with exit code {}".format(output.returncode))
+# Capture video clips and extract images
+counter = 0
+while cap.isOpened():
+    # Capture a frame
+    ret, frame = cap.read()
+    if ret:
+        # Save the frame
+        cv2.imwrite(os.path.join(video_folder, "clip_{:05d}.png".format(counter)), frame)
+
+        # Extract an image
+        cv2.imwrite(os.path.join(image_folder, "image_{:05d}.png".format(counter)), image)
+
+        # Sleep
+        time.sleep(interval)
+        counter += 1
+    else:
+        break
+
+# Stop video capture
+cap.release()
