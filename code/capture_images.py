@@ -3,7 +3,7 @@ import os
 import cv2
 from PIL import Image
 
-def capture_images(video_id, capture_interval = 600):
+def capture_images(video_id, capture_interval = 120):
     # Capture images from the video
     try:
         # Set the output and image folders
@@ -17,7 +17,7 @@ def capture_images(video_id, capture_interval = 600):
 
         # Capture images
         success, image = vidcap.read()
-        image_number = 1
+        image_number = 32
         
         while success:
             image_number += 1
