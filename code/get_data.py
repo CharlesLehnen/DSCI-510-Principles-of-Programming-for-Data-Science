@@ -2,7 +2,7 @@ import os
 import time
 import subprocess
 import cv2
-import ffmpeg_python
+import ffmpeg
 import youtube_dl
 import io
 from pytube import YouTube
@@ -10,11 +10,13 @@ from urllib.parse import urlparse
 from subprocess import TimeoutExpired, CalledProcessError
 import signal
 
+
 # SET PARAMETERS
 
 INTERVAL = 15
 max_runtime = 7
 video_length = 7
+VIDEO_LENGTH = 7
 
 
 # Set URL of YouTube live video and names
@@ -39,9 +41,23 @@ if not os.path.exists(image_folder):
   
 # Download video
 
+video_output = os.path.join(os.getcwd(), "data", "videos")
+
+command = [
+    "youtube-dl",
+    "--output", f"{video_output}/video_%(id)s.%(ext)s",
+    "--no-part",
+    url
+]
+
+# Download the video using youtube-dl
+subprocess.run(command, timeout = VIDEO_LENGTH)
+
+'''
+
 ## Set process
 command = ['youtube-dl', '-o', output_file, '--format', 'mp4', url, '|', 'ffmpeg', '-i', '-', '-t', max_runtime, output_file]
-process = subprocess.Popen(command)
+subprocess.Popen(command)
 
 
 # Wait for the process to complete or exceed the maximum runtime
@@ -64,9 +80,9 @@ finally:
     # Perform any other necessary cleanup actions here
 
 
-
-
 '''
+'''
+
 
 #this worked some of the time, otherwise export mp4.part
 video_output = os.path.join(os.getcwd(), "data", "videos")
