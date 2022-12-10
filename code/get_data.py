@@ -1,32 +1,15 @@
-import os
 import time
 import subprocess
-import threading
-import io
+import os
 from urllib.parse import urlparse
-import signal
-
-# Create a global variable to store a reference to the youtube_dl_process
-youtube_dl_process = None
 
 def download_video(url):
-    global youtube_dl_process
-
-    # SET PARAMETERS
-    timeout = 7
-
-    # Set URL of YouTube live video and names
-    parsed_url = urlparse(url)
-    video_id = parsed_url.query.split("&")[0].split("=")[1]
-
     # Set up folder and file structure
     video_folder = os.path.join("data", "videos")
     if not os.path.exists(video_folder):
         os.mkdir(video_folder)
-    output_file = os.path.join(video_folder, f"video_{video_id}_trimmed.mp4")
-    image_folder = os.path.join("data", "images")
-    if not os.path.exists(image_folder):
-        os.mkdir(image_folder)
+    parsed_url = urlparse(url)
+    video_id = parsed_url.query.split("&")[0].split("=")[1]
 
     # Download video
     video_output = os.path.join(os.getcwd(), "data", "videos")
@@ -39,23 +22,12 @@ def download_video(url):
 
     # Start the youtube_dl_process
     youtube_dl_process = subprocess.Popen(command)
-
-# Set the URL of the YouTube live video
+    
+    
+# Set the URL of the YouTube live video and run
 url = "https://www.youtube.com/watch?v=ydYDqZQpim8"
+download_video(url)
 
-# Start the download_video() function in a separate thread
-youtube_dl_thread = threading.Thread(target=download_video, args=(url,))
-youtube_dl_thread.start()
-
-# Wait for the specified time
-time.sleep(timeout)
-
-# Use the terminate() method of the youtube_dl_process to terminate the youtube_dl_process
-youtube_dl_process.terminate()
-
-# Check the return code to see if the youtube_dl_process was terminated
-if youtube_dl_process.poll() == -signal.SIGKILL:
-    print("The youtube_dl_process was terminated after running for %d seconds" % timeout)
 
 
 
