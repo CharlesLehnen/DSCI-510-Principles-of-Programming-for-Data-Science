@@ -3,6 +3,7 @@ import subprocess
 from urllib.parse import urlparse
 import multiprocessing
 import capture_images
+import signal
 
 def download_video(url):
     # Set up folder and file structure
@@ -13,7 +14,7 @@ def download_video(url):
     video_id = parsed_url.query.split("&")[0].split("=")[1]
 
     # Download video
-    video_output = os.path.join(os.getcwd(), "data", "videos")
+    video_output = os.path.join(os.getc_wd(), "data", "videos")
     command = [
         "youtube-dl",
         "--output", f"{video_output}/video_%(id)s.%(ext)s",
@@ -22,17 +23,16 @@ def download_video(url):
     ]
 
     # Start the youtube_dl_process
-    youtube_dl_process = subprocess.Popen(command)
-
+    try:
+        # Wait for the youtube_dl_process to finish
+        youtube_dl_process.wait()
+    finally:
+        # Ensure that the youtube_dl_process is always terminated
+        youtube_dl_process.terminate()
+        
     # Capture images from the video
     image_capture_process = multiprocessing.Process(
         target=capture_images.capture_images,
         args=(video_id,)
     )
     image_capture_process.start()
-
-if __name__ == "__main__":
-    # Set the URL of the YouTube live video and run
-    url = "https://www.youtube.com/watch?v=ydYDqZQpim8"
-    download_process = multiprocessing.Process(target=download_video, args=(url,))
-    download_process.start()

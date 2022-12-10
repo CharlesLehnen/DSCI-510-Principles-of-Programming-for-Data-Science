@@ -3,7 +3,7 @@ import os
 import cv2
 from PIL import Image
 
-def capture_images(video_id, capture_interval=1):
+def capture_images(video_id, capture_interval=15):
     # Capture images from the video
     try:
         start_time = time.time()
