@@ -2,17 +2,19 @@ import os
 import time
 import subprocess
 import cv2
-import ffmpeg
+import ffmpeg_python
 import youtube_dl
 import io
 from pytube import YouTube
 from urllib.parse import urlparse
+from subprocess import TimeoutExpired, CalledProcessError
+import signal
 
 # SET PARAMETERS
 
 INTERVAL = 15
-MAX_RUNTIME = 3
-VIDEO_LENGTH = 5
+max_runtime = 7
+video_length = 7
 
 
 # Set URL of YouTube live video and names
@@ -22,31 +24,45 @@ video_id = parsed_url.query.split("&")[0].split("=")[1]
 
 
 
-# Set up folder structure
+# Set up folder and file structure
 
-## Set the video and image folders
 video_folder = os.path.join("data", "videos")
 if not os.path.exists(video_folder):
     os.mkdir(video_folder)
+
+output_file = os.path.join(video_folder, f"video_{video_id}_trimmed.mp4")
 
 image_folder = os.path.join("data", "images")
 if not os.path.exists(image_folder):
     os.mkdir(image_folder)
    
-    
+  
 # Download video
 
-output_file = os.path.join(video_folder, f"video_{video_id}_trimmed.mp4")
+## Set process
+command = ['youtube-dl', '-o', output_file, '--format', 'mp4', url, '|', 'ffmpeg', '-i', '-', '-t', max_runtime, output_file]
+process = subprocess.Popen(command)
 
-# Set the maximum runtime in seconds
-max_runtime = 10
 
+# Wait for the process to complete or exceed the maximum runtime
 try:
-    # Run the download and processing commands with a maximum runtime
-    subprocess.run("youtube-dl -o {} --format mp4 {} | ffmpeg -i - -t {} {}".format(output_file, url, str(max_runtime), output_file), shell=True, timeout=max_runtime)
-except subprocess.CalledProcessError:
+    process.wait(timeout=max_runtime)
+except subprocess.TimeoutExpired:
+    # Use the os.kill() function to send the SIGKILL signal directly to the youtube-dl process
+    os.kill(process.pid, signal.SIGKILL)
     # Print a message indicating that the commands timed out
     print("Download and processing timed out after {} seconds".format(max_runtime))
+except subprocess.CalledProcessError as e:
+    # Print a message indicating that the commands returned a non-zero exit code
+    print("Download and processing failed with exit code {}".format(e.returncode))
+else:
+    # Print a message indicating that the commands completed successfully
+    print("Download and processing completed successfully")
+finally:
+    # Open the video file that was created by the youtube-dl and ffmpeg commands
+    print("Proces ended")
+    # Perform any other necessary cleanup actions here
+
 
 
 
