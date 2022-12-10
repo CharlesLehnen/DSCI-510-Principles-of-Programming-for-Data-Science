@@ -6,6 +6,7 @@ import ffmpeg
 import youtube_dl
 import io
 from pytube import YouTube
+from urllib.parse import urlparse
 
 # SET PARAMETERS
 
@@ -16,8 +17,9 @@ VIDEO_LENGTH = 5
 
 # Set URL of YouTube live video and names
 url = "https://www.youtube.com/watch?v=ydYDqZQpim8"
-first, second = url.split('=')
-video_id = second
+parsed_url = urlparse(url)
+video_id = parsed_url.query.split("&")[0].split("=")[1]
+
 
 
 # Set up folder structure
@@ -34,19 +36,18 @@ if not os.path.exists(image_folder):
     
 # Download video
 
-
-
-# Set the path to the output video file
 output_file = os.path.join(video_folder, f"video_{video_id}_trimmed.mp4")
 
-# Set the maximum duration of the video in seconds
-max_time = 5
+# Set the maximum runtime in seconds
+max_runtime = 10
 
-# Download the video using youtube-dl and pipe the output to ffmpeg
-command = "youtube-dl -o {} --format mp4 {} | ffmpeg -i - -t {} {}".format(output_file, url, str(max_time), output_file)
-subprocess.run(command, shell=True)
+try:
+    # Run the download and processing commands with a maximum runtime
+    subprocess.run("youtube-dl -o {} --format mp4 {} | ffmpeg -i - -t {} {}".format(output_file, url, str(max_runtime), output_file), shell=True, timeout=max_runtime)
+except subprocess.CalledProcessError:
+    # Print a message indicating that the commands timed out
+    print("Download and processing timed out after {} seconds".format(max_runtime))
 
-subprocess.run(command)
 
 
 '''
