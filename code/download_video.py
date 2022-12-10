@@ -1,15 +1,11 @@
+from urllib.parse import urlparse
+import multiprocessing
+import capture_images
+import signal
 import os
 import subprocess
-import time
-import signal
-from urllib.parse import urlparse
-import asyncio
-import capture_images
 
-# Register a signal handler that will be called when the user presses CTRL+C
-signal.signal(signal.SIGINT, lambda signum, frame: youtube_dl_process.kill())
-
-async def download_video(url, video_length=7):
+def download_video(url):
     # Set up folder and file structure
     video_folder = os.path.join("data", "videos")
     if not os.path.exists(video_folder):
@@ -21,72 +17,23 @@ async def download_video(url, video_length=7):
     video_output = os.path.join(os.getcwd(), "data", "videos")
     command = [
         "youtube-dl",
-        "--output", f"{video_output}/video_%(id)s.%(ext)s",
-        "--no-part",
+        "--output", f"{video_output}/video_%(id)s.%(ext)s", # This fixed the default naming conflict errors
+        "--no-part", # This fixed the .mp4.part issue
         url
     ]
 
-    # Start the youtube_dl_process asynchronously
-    # try:
-    #     youtube_dl_process = await asyncio.create_subprocess_exec(*command)
-    #     await asyncio.wait([youtube_dl_process], timeout=video_length)
-    # except asyncio.TimeoutError:
-    #     youtube_dl_process.kill()
-    #     raise
-    # finally:
-    #     youtube_dl_process.kill()
-    
-    # try:
-    #     youtube_dl_process = await asyncio.create_subprocess_exec(*command)
-    #     await asyncio.wait_for(youtube_dl_process, timeout=video_length)
-    #     if youtube_dl_process.returncode != 0:
-    #         raise asyncio.TimeoutError
-    # except asyncio.TimeoutError:
-    #     youtube_dl_process.kill()
-    #     raise
-    # finally:
-    #     youtube_dl_process.kill()
-    
-    # Start the youtube_dl_process asynchronously
-    youtube_dl_process = await asyncio.create_subprocess_exec(*command)
-
-    # Wait for the youtube_dl_process to finish or timeout, whichever happens first
-    # try:
-    #     youtube_dl_process = asyncio.create_task(asyncio.create_subprocess_exec(*command))
-    #     await asyncio.wait_for(youtube_dl_process, timeout=video_length)
-    # except asyncio.TimeoutError:
-    #     youtube_dl_process.kill()
-    #     raise
-    # finally:
-    #     youtube_dl_process.kill()
+    youtube_dl_process = subprocess.Popen(command) # Subprocess seems to be the only way to get it to run
         
-    # THIS one works but have to hold donw ctrl c    
-    try:
-        youtube_dl_process = await asyncio.create_subprocess_exec(*command)
-        await asyncio.wait_for(youtube_dl_process.wait(), timeout=video_length)
-    except asyncio.TimeoutError:
-        youtube_dl_process.kill()
-        raise
-    finally:
-        youtube_dl_process.kill()
-
-
-    # try:
-    #     await asyncio.wait_for(youtube_dl_process, timeout=video_length)
-    # except asyncio.TimeoutError:
-    #     youtube_dl_process.kill()
-    #     raise
-        
-
-    # Check the return code of the youtube_dl_process
-    if youtube_dl_process.returncode != 0:
-        youtube_dl_process.kill()
-        raise
-
-    # Capture images from the video
-    await capture_images.capture_images(video_id)
+    # Capture images from video simultaneously using capture_images.py
+    image_capture_process = multiprocessing.Process(
+        target=capture_images.capture_images,
+        args=(video_id,)
+    )
+    image_capture_process.start()
+    
 
 if __name__ == "__main__":
     # Set the URL of the YouTube live video and run
     url = "https://www.youtube.com/watch?v=ydYDqZQpim8"
-    asyncio.run(download_video(url))
+    download_process = multiprocessing.Process(target=download_video, args=(url,))
+    download_process.start()

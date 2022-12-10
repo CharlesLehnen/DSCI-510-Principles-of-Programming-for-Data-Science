@@ -15,12 +15,14 @@ def capture_images(video_id, capture_interval=15):
         success, image = vidcap.read()
         count = 0
         while success:
-            if count % capture_interval == 0:
+            if count % capture_interval == 0 :
                 image_file = os.path.join(image_folder, f"image_{video_id}_{count}.jpg")
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 Image.fromarray(image).save(image_file)
             success, image = vidcap.read()
             count += 1
+            print(count)
+            
     except KeyboardInterrupt:
         end_time = time.time()
         runtime = end_time - start_time
