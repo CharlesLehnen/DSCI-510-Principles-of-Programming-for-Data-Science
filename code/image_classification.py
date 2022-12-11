@@ -6,19 +6,47 @@ from PIL import Image
 from torchvision import transforms
 from torchvision.models.vgg import VGG16_Weights
 import subprocess
+from torchvision import datasets
+import urllib.request
+
+
+
+# Create a list of unique class indexes that were generated earlier by my script
+class_indexes = [346, 346, 346, 977, 979, 351, 343, 343, 343, 351, 345, 978, 978, 833, 977, 977, 472, 876, 876, 435, 730, 977, 537,
+                 977, 978, 978, 876, 977, 833, 978, 876, 977, 876, 977, 977, 977, 354, 344, 537, 876, 537, 625, 978, 977, 537,
+                 977, 978, 978, 537, 977]
+
+# Remove duplicate class indexes
+class_indexes = set(class_indexes)
+
+# Load the ImageNet dataset
+imagenet_dataset = datasets.ImageNet(root="data/imagenet", split="val")
+
+# Get the label mapping for the dataset
+label_mapping = imagenet_dataset.label_mapping
+
+# Print the class names for each unique class index
+for index in class_indexes:
+    print(f"Class index {index}: {label_mapping[index]}")
+
+'''
 
 # Install ILSVRC2012_devkit_t12 if not already installed
 
-## Set the root directory and file name
 root_dir = "data/imagenet"
-file_name = "ILSVRC2012_devkit_t12.tar.gz"
-file_url = "http://www.image-net.org/challenges/LSVRC/2012/nnoupb/" + file_name
+## Evidently it is not longer hosts here
+file_url = "http://www.image-net.org/challenges/LSVRC/2012/dd31405981ef5f776aa17412e1f0c112/ILSVRC2012_devkit_t12.tar.gz"
+if not os.path.exists(root_dir):
+    os.makedirs(root_dir)
+file_name = os.path.basename(file_url)
 
+print(file_name)
+    
 ## Check if the file is already present
 if not os.path.exists(os.path.join(root_dir, file_name)):
     # Download the file
-    subprocess.run(["wget", file_url, "-P", root_dir])
-
+    urllib.request.urlretrieve(file_url, os.path.join(root_dir, file_name))
+'''
 
 FILE_PATH = "data/images/archived"
 
