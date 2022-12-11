@@ -8,69 +8,58 @@ from torchvision.utils import draw_bounding_boxes
 from torchvision.transforms.functional import to_pil_image
 import torch
 
-# Path to the folder containing the image files
- 
-cwd = os.getcwd()
-IMAGE_FOLDER = os.path.join(cwd, "data", "images", "archived")
+# Set path
+IMAGE_FOLDER = "data/images/archived"
 
-# Check if the image folder exists and contains any files
-if not os.path.isdir(IMAGE_FOLDER):
-    print("The specified image folder does not exist.")
-    exit()
-elif len(os.listdir(IMAGE_FOLDER)) == 0:
-    print("The specified image folder does not contain any files.")
-    exit()
-else:
-    # Print the number of files in the image folder
-    print(f"The image folder contains {len(os.listdir(IMAGE_FOLDER))} files.")
+# Debug image folder path
+# if os.path.exists(IMAGE_FOLDER) and os.listdir(IMAGE_FOLDER):
+#     print(f"The image folder contains {len(os.listdir(IMAGE_FOLDER))} files.")
+# else:
+#     print("The image folder does not exist or is empty.")
 
-# Create lists to hold the paths to the training, validation, and test image sets
+# Create empthy lists for training, validation, and test image sets
 training_set = []
 validation_set = []
 test_set = []
 
-# Loop through the files in the image folder
+# Randomly assign approximately 70% images to training, 20% to validation, and %10 to test
 for file_name in os.listdir(IMAGE_FOLDER):
-    # Compute the path to the file
     file_path = os.path.join(IMAGE_FOLDER, file_name)
-
+    
+    # Random binanry
+    random_number = random.random()
+    
     # Add the file to the appropriate set (training, validation, or test)
-    # based on its name
-    if "training" in file_name:
+    if random_number < 0.7:
         training_set.append(file_path)
-    elif "validation" in file_name:
+    elif random_number < 0.9:
         validation_set.append(file_path)
-    elif "test" in file_name:
+    else:
         test_set.append(file_path)
 
-# Print the list of image paths
 print(training_set)
 print(validation_set)
 print(test_set)
 
-
-# Define the function to process the images and classify the detected objects
 def detect_and_classify_animals(image_paths):
-    # Load the pre-trained model with the default weights
+    # Load the pre-trained model with ***default*** weights
     model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(
         weights=FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
     )
 
-    # Create a list to hold the user-provided labels for the detected objects
     saved_labels = []
 
     # Loop through the images in the specified folder
     for file_path in image_paths:
-        # Load the image and run it through the model
         image = read_image(file_path)
         print(image)
         outputs = model(image)
 
-        # Extract the bounding boxes and labels for the detected objects
+        # Extract the bounding boxes and labels
         boxes = outputs[0]["boxes"].detach().numpy()
         labels = outputs[0]["labels"].detach().numpy()
 
-        # Draw the bounding boxes on the image
+        # Draw the bounding boxes 
         image_with_boxes = draw_bounding_boxes(image, boxes)
         pil_image = to_pil_image(image_with_boxes)
 
@@ -79,18 +68,17 @@ def detect_and_classify_animals(image_paths):
             print(f"Please classify the object in bounding box {box}:")
             user_label = input()
 
-            # Save the user-provided label for the object
-            # (You could save this in a file or database for later use)
+            # Save the label for the object
             saved_labels.append({"box": box, "label": user_label})
 
-        # Save the image with the bounding boxes drawn on it
+        # Save the modified image
         pil_image.save(file_path)
 
-    # Return the list of user-provided labels for the detected objects
+    # Return the list of user-provided labels
     return saved_labels
 
-# Use the function to process the images in the training set
+'''
+# Run the classification
 training_set_labels = detect_and_classify_animals(training_set)
-
-# Use the function to process the images in the validation set
 validation_set_labels = detect_and_classify_animals(validation_set)
+'''
