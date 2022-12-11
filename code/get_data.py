@@ -19,10 +19,7 @@ if __name__ == "__main__":
 
     # Start video capture and image capture in parallel
     with multiprocessing.Pool() as pool:
-        for url in urls:
-            download_result = pool.apply_async(download_video_function, (url,))
-            capture_result = pool.apply_async(partial(capture_images_function, capture_interval = capture_interval), (url,))
-            
-            # Wait for process to finish
-            download_result.wait()
-            capture_result.wait()
+        # Download videos
+        pool.map(download_video_function, urls)
+        # Capture images
+        pool.map(partial(capture_images_function, capture_interval = capture_interval), urls)
