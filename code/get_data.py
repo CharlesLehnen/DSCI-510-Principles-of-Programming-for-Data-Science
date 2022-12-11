@@ -16,22 +16,13 @@ if __name__ == "__main__":
     # Set the URLs of the YouTube live videos and run
     urls = ["https://www.youtube.com/watch?v=ydYDqZQpim8", "https://www.youtube.com/watch?v=gUZjDCZEMDA"]
     # Original link I wanted does not work right now: "https://www.youtube.com/watch?v=UeB6UcZpUzk"
-    
-    # Record start time
-    start = time.time()
 
-    # Start video capture
+    # Start video capture and image capture in parallel
     with multiprocessing.Pool() as pool:
-        pool.map(download_video_function, urls)
-
-    # Start parallel image capture
-    with multiprocessing.Pool() as pool:
-        pool.map(partial(capture_images_function, capture_interval = capture_interval), urls)
-
-    # Record end time
-    end = time.time()
-
-    # Calculate elapsed time
-    elapsed_time = end - start
-    
-    print(f'Video was downloaded and captured for {elapsed_time}')
+        for url in urls:
+            download_result = pool.apply_async(download_video_function, (url,))
+            capture_result = pool.apply_async(partial(capture_images_function, capture_interval = capture_interval), (url,))
+            
+            # Wait for process to finish
+            download_result.wait()
+            capture_result.wait()
