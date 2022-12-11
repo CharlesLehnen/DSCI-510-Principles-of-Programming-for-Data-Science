@@ -29,14 +29,18 @@ with os.scandir(data_path) as entries:
         if not entry.is_dir():
             # Step 3b: Read the image
             img = Image.open(entry.path)
-            # Step 3c: Use the Faster R-CNN model to get a prediction for the image, set target to none
-            prediction = model([img], targets=None)[0]
-            # Step 3d: Draw bounding boxes around the animals in the image
+            # Step 3c: Convert the image to a torch.Tensor object
+            img_tensor = to_tensor(img)
+            # Step 3d: Use the Faster R-CNN model to get a prediction for the image
+            prediction = model([img_tensor], targets=None)[0]
+            # Step 3e: Draw bounding boxes around the animals in the image
             labels = [weights.meta["categories"][i] for i in prediction["labels"]]
             box = draw_bounding_boxes(img, boxes=prediction["boxes"], labels=labels,
                                       colors="red", width=4, font_size=30)
-            # Step 3e: Convert the image to a PIL Image
+            # Step 3f: Convert the image to a PIL Image
             im = to_pil_image(box.detach())
             # Step 3f: Save the image to the cropped folder
             im.save(os.path.join(cropped_path, entry.name))
+            
+
 
