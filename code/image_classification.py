@@ -1,28 +1,61 @@
 import os
 import random
 from PIL import Image
+import torchvision
+from torchvision.io.image import read_image
+from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_ResNet50_FPN_V2_Weights
+from torchvision.utils import draw_bounding_boxes
+from torchvision.transforms.functional import to_pil_image
+import torch
 
 # Path to the folder containing the image files
 IMAGE_FOLDER = "data/images/archived"
 
-# Create lists to hold the paths to the training, validation, and test image sets
+# Initialize empty lists to hold the paths to the training, validation, and test image sets
 training_set = []
 validation_set = []
 test_set = []
 
-# Randomly split the image files into the different sets, ensuring that each set contains at least one image
+# Loop through the files in the image folder
 for file_name in os.listdir(IMAGE_FOLDER):
     file_path = os.path.join(IMAGE_FOLDER, file_name)
-    if len(training_set) < 1:
+
+    # Add the file to the appropriate set (training, validation, or test)
+    if "training" in file_name:
         training_set.append(file_path)
-    elif len(validation_set) < 1:
+    elif "validation" in file_name:
         validation_set.append(file_path)
-    elif len(test_set) < 1:
+    elif "test" in file_name:
         test_set.append(file_path)
-    else:
-        set_to_add_to = random.choice([training_set, validation_set, test_set])
-        set_to_add_to.append(file_path)
-        
-print(training_set)
-print(validation_set)
-print(test_set)
+
+# Image detection function
+def detect_and_classify_animals(image_paths):
+    # Print the number of images in the list to check for erro
+    print(len(image_paths))
+
+    # Load the pre-trained model with **default** weights
+    model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(
+        weights=FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
+    )
+
+    # Create a list to hold the user-provided labels for the detected objects
+    saved_labels = []
+
+    # Loop through the images
+    for file_path in image_paths:
+        # Load the image
+        image = read_image(file_path)
+        outputs = model(image)
+
+        # Extract the bounding boxes
+        boxes = outputs[0]["boxes"].detach().numpy()
+        labels = outputs[0]["labels"].detach().numpy()
+
+        # Draw the bounding boxes
+        image_with_boxes = draw_bounding_boxes(image, boxes)
+        pil_image = to_pil_image(image_with_boxes)
+
+
+
+# Use the function to process the images in the training set
+training_set_labels = detect_and_classify_animals(training_set)
