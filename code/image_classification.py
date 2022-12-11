@@ -7,6 +7,7 @@ from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_
 from torchvision.utils import draw_bounding_boxes
 from torchvision.transforms.functional import to_pil_image
 import torch
+import matplotlib.pyplot as plt
 
 # Set path
 IMAGE_FOLDER = "data/images/archived"
@@ -37,22 +38,29 @@ for file_name in os.listdir(IMAGE_FOLDER):
     else:
         test_set.append(file_path)
 
-print(training_set)
-print(validation_set)
-print(test_set)
+# For debugging
+# print(training_set)
+# print(validation_set)
+# print(test_set)
 
 def detect_and_classify_animals(image_paths):
     # Load the pre-trained model with ***default*** weights
     model = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(
         weights=FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
     )
+    # Set the model to inference mode
+    model.training = False
 
     saved_labels = []
 
-    # Loop through the images in the specified folder
+   # Loop through the images in the specified folder
     for file_path in image_paths:
         image = read_image(file_path)
-        print(image)
+
+        # Add a third dimension to the image tensor
+        image = image.unsqueeze(0)
+
+        # Run the model on the image
         outputs = model(image)
 
         # Extract the bounding boxes and labels
@@ -63,7 +71,11 @@ def detect_and_classify_animals(image_paths):
         image_with_boxes = draw_bounding_boxes(image, boxes)
         pil_image = to_pil_image(image_with_boxes)
 
-        # Loop through the detected objects and ask the user to classify each one
+        # Show the image
+        plt.imshow(pil_image)
+        plt.show()
+
+        # Loop through the detected objects and ask the user to classify species of each one
         for box, label in zip(boxes, labels):
             print(f"Please classify the object in bounding box {box}:")
             user_label = input()
@@ -77,8 +89,8 @@ def detect_and_classify_animals(image_paths):
     # Return the list of user-provided labels
     return saved_labels
 
-'''
-# Run the classification
+
+
+# Start the manual classification
 training_set_labels = detect_and_classify_animals(training_set)
 validation_set_labels = detect_and_classify_animals(validation_set)
-'''
