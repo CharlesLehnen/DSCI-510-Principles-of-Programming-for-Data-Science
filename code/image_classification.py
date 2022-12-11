@@ -15,6 +15,13 @@ model = fasterrcnn_resnet50_fpn(weights=weights, box_score_thresh=0.9)
 # Set the model to evaluation mode
 model.eval()
 
+# Print the contents of the weights.meta["categories"] dictionary
+print(weights.meta["categories"])
+
+'''
+['__background__', 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'N/A', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'N/A', 'backpack', 'umbrella', 'N/A', 'N/A', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'N/A', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'N/A', 'dining table', 'N/A', 'N/A', 'toilet', 'N/A', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'N/A', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush']
+'''
+
 # Step 2: Create a new folder to store the cropped images
 cropped_path = "data/images/cropped"
 if not os.path.exists(cropped_path):
@@ -32,7 +39,8 @@ for entry in os.scandir(data_path):
         prediction = model([img_tensor], targets=None)[0]
         
         # Step 3d: Draw bounding boxes around the animals in the image
-        labels = [weights.meta["categories"][i] for i in prediction["labels"]]
+        categories = weights.meta["categories"]
+        labels = [categories[i] for i in prediction["labels"]]
         
         # Convert the tensor to the torch.uint8 type
         img_tensor = img_tensor.to(dtype=torch.uint8)
