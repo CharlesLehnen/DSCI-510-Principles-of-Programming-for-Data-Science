@@ -26,14 +26,13 @@ def capture_images(url, capture_interval = 120):
         ## Filter, extract, and sort
         image_files = [f for f in image_files if f.startswith(f"image_{video_id}_") and f.endswith(".jpg")]
         image_numbers = [int(f.split("_")[-1].split(".")[0]) for f in image_files]
-        image_files.sort()
+        image_numbers.sort()
 
         ## Extract number from last image
-        last_image_file = image_files[-1]
-        image_number = last_image_file.split("_")[-1].split(".")[0]
+        last_image_number = image_numbers[-1]
         
         ## Set new image number
-        image_number = last_image_number + 1
+        image_number = last_image_number
         
         # Open the video file
         vidcap = cv2.VideoCapture(os.path.join(video_output, f"video_{video_id}.mp4"))
