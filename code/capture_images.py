@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 import multiprocessing
 from functools import partial
 
-def capture_images(url, capture_interval = 120):
+def capture_images(url, capture_interval = 600):
     
     # Extract video_id from url
     parsed_url = urlparse(url)
