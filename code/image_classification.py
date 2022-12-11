@@ -9,9 +9,20 @@ from torchvision.transforms.functional import to_pil_image
 import torch
 
 # Path to the folder containing the image files
-IMAGE_FOLDER = "data/images/archived"
-print(IMAGE_FOLDER)
+ 
+cwd = os.getcwd()
+IMAGE_FOLDER = os.path.join(cwd, "data", "images", "archived")
 
+# Check if the image folder exists and contains any files
+if not os.path.isdir(IMAGE_FOLDER):
+    print("The specified image folder does not exist.")
+    exit()
+elif len(os.listdir(IMAGE_FOLDER)) == 0:
+    print("The specified image folder does not contain any files.")
+    exit()
+else:
+    # Print the number of files in the image folder
+    print(f"The image folder contains {len(os.listdir(IMAGE_FOLDER))} files.")
 
 # Create lists to hold the paths to the training, validation, and test image sets
 training_set = []
