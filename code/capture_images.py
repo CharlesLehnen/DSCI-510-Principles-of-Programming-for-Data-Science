@@ -23,8 +23,9 @@ def capture_images(url, capture_interval = 120):
         # Code to start at image name that was left off at
         
         image_files = os.listdir(image_folder)
-        ## Filter and sort
+        ## Filter, extract, and sort
         image_files = [f for f in image_files if f.startswith(f"image_{video_id}_") and f.endswith(".jpg")]
+        image_numbers = [int(f.split("_")[-1].split(".")[0]) for f in image_files]
         image_files.sort()
 
         ## Extract number from last image
@@ -32,7 +33,7 @@ def capture_images(url, capture_interval = 120):
         image_number = last_image_file.split("_")[-1].split(".")[0]
         
         ## Set new image number
-        image_number = int(image_number)
+        image_number = last_image_number + 1
         
         # Open the video file
         vidcap = cv2.VideoCapture(os.path.join(video_output, f"video_{video_id}.mp4"))
