@@ -54,6 +54,20 @@ def detect_and_classify_animals(image_paths):
         # Draw the bounding boxes
         image_with_boxes = draw_bounding_boxes(image, boxes)
         pil_image = to_pil_image(image_with_boxes)
+        
+        # Loop through the detected objects and ask user to classify them manually
+        for box, label in zip(boxes, labels):
+            print(f"Please classify the object in bounding box {box}:")
+            user_label = input()
+
+            # Save the user-provided lable
+            saved_labels.append({"box": box, "label": user_label})
+
+        # Save the image with the labelled bounding boxes drawn on it
+        pil_image.save(file_path)
+
+    # Return the list of user-provided labels for the detected objects
+    return saved_labels
 
 
 
