@@ -1,103 +1,42 @@
 import os
-import torch
-import torchvision
-import cv2
+from torchvision.models.detection import fasterrcnn_resnet50_fpn, FasterRCNN_ResNet50_FPN_Weights
+from torchvision.io.image import read_image
+from torchvision.utils import draw_bounding_boxes, save_image
+from torchvision.transforms.functional import to_pil_image
 from PIL import Image
-from torchvision import transforms
-from torchvision.models.vgg import VGG16_Weights
-import subprocess
-from torchvision import datasets
-import urllib.request
 
+# Change to the path of your images folder
+data_path = "data/images"
+# Make the file readable by everyone
+os.chmod(data_path, 0o644)
 
+# Step 1: Initialize the Faster R-CNN model with the best available weights
+weights = FasterRCNN_ResNet50_FPN_Weights.DEFAULT
+model = fasterrcnn_resnet50_fpn(weights=weights, box_score_thresh=0.9)
+# Set the model to evaluation mode
+model.eval()
 
-# Create a list of unique class indexes that were generated earlier by my script
-class_indexes = [346, 346, 346, 977, 979, 351, 343, 343, 343, 351, 345, 978, 978, 833, 977, 977, 472, 876, 876, 435, 730, 977, 537,
-                 977, 978, 978, 876, 977, 833, 978, 876, 977, 876, 977, 977, 977, 354, 344, 537, 876, 537, 625, 978, 977, 537,
-                 977, 978, 978, 537, 977]
+# Step 2: Create a new folder to store the cropped images
+cropped_path = "data/images/cropped"
+if not os.path.exists(cropped_path):
+    os.mkdir(cropped_path)
+    os.chmod(cropped_path, 0o644)
 
-# Remove duplicate class indexes
-class_indexes = set(class_indexes)
-
-# Load the ImageNet dataset
-imagenet_dataset = datasets.ImageNet(root="data/imagenet", split="val")
-
-# Get the label mapping for the dataset
-label_mapping = imagenet_dataset.label_mapping
-
-# Print the class names for each unique class index
-for index in class_indexes:
-    print(f"Class index {index}: {label_mapping[index]}")
-
-'''
-
-# Install ILSVRC2012_devkit_t12 if not already installed
-
-root_dir = "data/imagenet"
-## Evidently it is not longer hosts here
-file_url = "http://www.image-net.org/challenges/LSVRC/2012/dd31405981ef5f776aa17412e1f0c112/ILSVRC2012_devkit_t12.tar.gz"
-if not os.path.exists(root_dir):
-    os.makedirs(root_dir)
-file_name = os.path.basename(file_url)
-
-print(file_name)
-    
-## Check if the file is already present
-if not os.path.exists(os.path.join(root_dir, file_name)):
-    # Download the file
-    urllib.request.urlretrieve(file_url, os.path.join(root_dir, file_name))
-'''
-
-FILE_PATH = "data/images/archived"
-
-# Load VggNet model
-model = torchvision.models.vgg16(weights=VGG16_Weights.IMAGENET1K_V1)
-imagenet_dataset = torchvision.datasets.ImageNet(root="data/imagenet", split="val")
-
-# Define preprocessing transformation
-transform = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-])
-
-# Loop through images
-for filename in os.listdir(FILE_PATH):
-    # Load the image and convert it to a PIL.Image
-    image = cv2.imread(os.path.join(FILE_PATH, filename))
-
-    # Use the model to make predictions
-    with torch.no_grad():
-        output = model(transform(Image.fromarray(image)).unsqueeze(0))
-
-    # Get the class with the highest probability
-    _, predicted = torch.max(output, 1)
-    
-    # Print the predicted classes
-    class_names = imagenet_dataset.label_mapping
-    predicted_class_name = imagenet_dataset.label_mapping[predicted]
-    print("Predicted class index:", predicted)
-    print("Predicted class names:", predicted_class_name)
-
-    # Use the VGG16 model to detect animals
-    if predicted == "animals":
-        # Use OpenCV to detect animals in the image
-        animal_cascade = cv2.CascadeClassifier("data/cascades/animals.xml")
-        animals = animal_cascade.detectMultiScale(image, scaleFactor=1.05, minNeighbors=5)
-        
-        # Print the number of detected animals
-        print("Number of detected animals:", len(animals))
-
-        # Loop through detected animals
-        for (x, y, w, h) in animals:
-            # Create a bounding box around the animal
-            cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
-
-            # Crop the image to the bounding box and save it
-            cropped_image = image[y:y+h, x:x+w]
-            cv2.imwrite(f"cropped/{filename}", cropped_image)
-            if not os.path.exists(cropped):
-                os.mkdir(cropped)
-            cv2.imwrite(f"cropped/{filename}", cropped_image)
+# Step 3: Iterate over all entries in the data folder
+with os.scandir(data_path) as entries:
+    for entry in entries:
+        # Step 3a: If the entry is not a directory, process it
+        if not entry.is_dir():
+            # Step 3b: Read the image
+            img = Image.open(entry.path)
+            # Step 3c: Use the Faster R-CNN model to get a prediction for the image, set target to none
+            prediction = model([img], targets=None)[0]
+            # Step 3d: Draw bounding boxes around the animals in the image
+            labels = [weights.meta["categories"][i] for i in prediction["labels"]]
+            box = draw_bounding_boxes(img, boxes=prediction["boxes"], labels=labels,
+                                      colors="red", width=4, font_size=30)
+            # Step 3e: Convert the image to a PIL Image
+            im = to_pil_image(box.detach())
+            # Step 3f: Save the image to the cropped folder
+            im.save(os.path.join(cropped_path, entry.name))
 
