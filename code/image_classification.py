@@ -2,7 +2,8 @@ import os
 from torchvision.io.image import read_image
 from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_ResNet50_FPN_V2_Weights
 from torchvision.utils import draw_bounding_boxes
-from torchvision.transforms.functional import to_pil_image
+from torchvision.transforms.functional import to_pil_image, crop
+import torch
 
 # Directory containing images to process
 image_dir = "data/images"
@@ -15,8 +16,9 @@ if not os.path.exists(cropped_dir):
     os.makedirs(cropped_dir)
 
 # Step 1: Initialize model with the best available weights
+## Change parameter here to adjust!!
 weights = FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
-model = fasterrcnn_resnet50_fpn_v2(weights=weights, box_score_thresh=0.9)
+model = fasterrcnn_resnet50_fpn_v2(weights=weights, box_score_thresh=0.5)
 model.eval()
 
 # Step 2: Initialize the inference transforms
@@ -45,3 +47,22 @@ for filename in os.listdir(image_dir):
 
     # Save the cropped image
     im.save(os.path.join(cropped_dir, filename))
+
+
+
+    # Crop each image to the bounding box for each animal
+    # and save it to the cropped_dir directory
+    for i, box in enumerate(prediction["boxes"]):
+        # Convert float values to integers
+        box = torch.round(box)
+        x1, y1, x2, y2 = box
+        x1 = int(x1)
+        y1 = int(y1)
+        x2 = int(x2)
+        y2 = int(y2)
+        print(x1, y1, x2, y2)
+        cropped_im = crop(im, x1, y1, x2, y2)
+        cropped_im.save(os.path.join(cropped_dir, f"{filename}_{i}.jpg"))
+        
+
+
