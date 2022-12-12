@@ -77,7 +77,19 @@ def classify_and_crop(image_dir, cropped_dir):
             cropped_im.save(os.path.join(cropped_dir, f"{filename}_{i}.jpg"))
         
 
+# Step 5: Split the paths of the cropped images into training, validation, and test sets
+# Get all paths of the cropped images
+cropped_paths = [os.path.join(cropped_dir, filename) for filename in os.listdir(cropped_dir)]
 
-        
+# Shuffle the paths
+random.shuffle(cropped_paths)
 
+# Split the paths into training, validation, and test sets
+train_paths = cropped_paths[:int(len(cropped_paths) * 0.7)]
+valid_paths = cropped_paths[int(len(cropped_paths) * 0.7):int(len(cropped_paths) * 0.9)]
+test_paths = cropped_paths[int(len(cropped_paths) * 0.9):]
 
+# For debugging
+# print(f'Training: {train_paths}')
+# print(f'Training: {valid_paths}')
+# print(f'Training: {test_paths}')
