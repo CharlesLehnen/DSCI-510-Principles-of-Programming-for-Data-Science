@@ -33,7 +33,7 @@ class AnimalDataset(Dataset):
         # Skip processing filenames that are directories
         self.image_filenames = [filename for filename in self.image_filenames if not os.path.isdir(filename)]
         self.image_labels = [image_labels.get(os.path.basename(filename), 'unknown') for filename in self.image_filenames]
-
+        
         # Store the transforms object
         self.transform = transform
 
@@ -128,7 +128,11 @@ def classify_and_crop(image_dir, cropped_dir):
             
             # Ask the user to classify the detected object
             label = input(f"Enter a classification label for the object in box {i+1}: ")
-            image_labels[filename] = label
+            if label not in image_labels:
+                # If the label does not exist in the dictionary, add it
+                image_labels[label] = []
+            # Append the filename to the list of filenames for this label
+            image_labels[label].append(filename)
 
             # Add the image and label to the dataset
             dataset.add_image(os.path.join(cropped_dir, f"{filename}_{i+1}.png"), label)
@@ -147,4 +151,3 @@ else:
     print("The classify_and_crop function will not be run at this time.")
 
 print(image_labels)
-type(list(image_labels.items())[0])
