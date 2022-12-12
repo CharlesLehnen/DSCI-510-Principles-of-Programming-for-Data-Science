@@ -60,9 +60,20 @@ for filename in os.listdir(image_dir):
         y1 = int(y1)
         x2 = int(x2)
         y2 = int(y2)
-        print(x1, y1, x2, y2)
-        cropped_im = crop(im, x1, y1, x2, y2)
+
+        # Compute the coordinates of the crop region
+        # based on the bounding box coordinates
+        top = y1
+        left = x1
+        height = y2 - y1
+        width = x2 - x1
+
+        # Crop the image
+        cropped_im = crop(im, top, left, height, width)
+
+        # Save the cropped image
         cropped_im.save(os.path.join(cropped_dir, f"{filename}_{i}.jpg"))
+
         
 
 
