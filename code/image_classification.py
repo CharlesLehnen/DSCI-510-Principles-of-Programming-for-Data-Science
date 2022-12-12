@@ -73,8 +73,24 @@ def classify_and_crop(image_dir, cropped_dir):
     # Step 2: Initialize the inference transforms
     preprocess = weights.transforms()
 
-    # Process all files in the image directory
-    for filename in os.listdir(image_dir):
+    # Separate into sets
+    
+    ## Get filenames and shuffle
+    filenames = [filename for filename in os.listdir(image_dir)]
+    # Remove folders
+    filenames = [filename for filename in filenames if not os.path.isdir(os.path.join(image_dir, filename))]
+    random.shuffle(filenames)
+
+    ## Randomly assign approximately 70% filenames to training, 20% to validation, and %10 to test
+    train_filenames = filenames[:int(len(filenames) * 0.7)]
+    valid_filenames = filenames[int(len(filenames) * 0.7):int(len(filenames) * 0.9)]
+    test_filenames = filenames[int(len(filenames) * 0.9):]
+    
+    filename = None
+
+    # Process training and validation files in the image directory
+    for filename in train_filenames + valid_filenames:
+        pass
         # Skip directories
         if os.path.isdir(os.path.join(image_dir, filename)):
             continue
@@ -137,6 +153,8 @@ def classify_and_crop(image_dir, cropped_dir):
             # Add the image and label to the dataset
             dataset.add_image(os.path.join(cropped_dir, f"{filename}_{i+1}.png"), label)
             
+    return train_filenames, valid_filenames, test_filenames
+            
             
 # Ask the user if they want to run the function
 should_run = input("Do you want to run the classify_and_crop function? (y/n)")
@@ -146,8 +164,9 @@ if should_run.lower() == "y":
     transform = Compose([
         ToTensor()
     ])
-    classify_and_crop(image_dir, cropped_dir)
+    train_filenames, valid_filenames, test_filenames = classify_and_crop(image_dir, cropped_dir)
 else:
     print("The classify_and_crop function will not be run at this time.")
 
-print(image_labels)
+print(f'Image dictionary: {image_labels}')
+print(f'Training filenames: {train_filenames}', f'Validation filenames: {valid_filenames}', f'Test filenames: {test_filenames}')
