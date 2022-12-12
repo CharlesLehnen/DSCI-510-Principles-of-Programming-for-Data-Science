@@ -110,7 +110,7 @@ def classify_and_crop(image_dir, cropped_dir):
                                   width=4, font_size=30)
         im = to_pil_image(box.detach())
 
-        # Save the cropped image
+        # Save the bounded image
         im.save(os.path.join(cropped_dir, filename))
 
 

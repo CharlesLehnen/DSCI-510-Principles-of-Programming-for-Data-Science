@@ -7,7 +7,6 @@ import time
 import os
 import cv2
 from PIL import Image
-import capture_images
 
 def download_video(url):
     try :
@@ -26,11 +25,6 @@ def download_video(url):
             url
         ]
         subprocess.run(command)
-
-        # Capture images from video using capture_images.py, geting rid of this because can control both these scripts from a third script instead
-        # parsed_url = urlparse(url)
-        # video_id = parsed_url.query.split("&")[0].split("=")[1]
-        # capture_images.capture_images(video_id)
         
     # This is the only way to accomplish this! I tried everything
     except KeyboardInterrupt:
