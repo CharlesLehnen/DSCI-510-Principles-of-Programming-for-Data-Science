@@ -76,7 +76,18 @@ def classify_and_crop(image_dir, cropped_dir):
 
             # Save the cropped image
             cropped_im.save(os.path.join(cropped_dir, f"{filename}_{i}.jpg"))
-        
+            
+# Ask the user if they want to run the function
+should_run = input("Do you want to run the classify_and_crop function? (y/n)")
+
+# Check the user's response and run the function if they want to
+if should_run.lower() == "y":
+  classify_and_crop(image_dir, cropped_dir)
+else:
+  print("The classify_and_crop function will not be run at this time.")
+
+
+'''
 
 # Step 5: Split the paths of the cropped images into training, validation, and test sets
 # Get all paths of the cropped images
@@ -106,3 +117,5 @@ for path in train_paths + valid_paths:
 
     # Store the classification somewhere (e.g. in a database)
     # ...
+
+'''
