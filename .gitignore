@@ -128,4 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 *.mp4
-*.jpg
+data/images/*
+data/images/Images_Backup*
+Test.ipynb
+
