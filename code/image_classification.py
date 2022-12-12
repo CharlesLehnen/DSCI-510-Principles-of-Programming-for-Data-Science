@@ -5,6 +5,7 @@ from torchvision.utils import draw_bounding_boxes
 from torchvision.transforms.functional import to_pil_image, crop
 import torch
 import random
+from PIL import Image
 
 # Directory containing images to process
 image_dir = "data/images"
@@ -93,3 +94,15 @@ test_paths = cropped_paths[int(len(cropped_paths) * 0.9):]
 # print(f'Training: {train_paths}')
 # print(f'Training: {valid_paths}')
 # print(f'Training: {test_paths}')
+
+# Iterate over the paths in the training and validation sets
+for path in train_paths + valid_paths:
+    # Open the image and display it to the user
+    img = Image.open(path)
+    img.show()
+
+    # Ask the user to classify the image
+    classification = input("Enter the classification for this image: ")
+
+    # Store the classification somewhere (e.g. in a database)
+    # ...
