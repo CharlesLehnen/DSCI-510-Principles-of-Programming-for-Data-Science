@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import seaborn as sns
 
 # Create empty dict
 file_dict = {}
@@ -33,5 +34,14 @@ for key, value in file_dict.items():
     new_df = pd.DataFrame({'video_id': [video_id], 'timestamp': [timestamp], 'count': [count]})
     df = pd.concat([df, new_df], ignore_index=True)
 
-# Print the dataframe
-df
+# Set the video_id column as the index of the dataframe
+df = df.set_index('video_id')
+
+# Convert the timestamp column to a datetime object
+df['timestamp'] = pd.to_datetime(df['timestamp'], format='%Y-%m-%d_%H-%M-%S')
+
+# Group the data by timestamp and aggregate the counts
+df = df.groupby('timestamp')['count'].sum()
+
+# Plot the time series using seaborn
+sns.lineplot(data=df)
