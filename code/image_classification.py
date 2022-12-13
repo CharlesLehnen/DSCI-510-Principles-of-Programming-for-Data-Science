@@ -14,16 +14,20 @@ from torchvision.transforms.functional import to_pil_image
 # Folder containing images to process
 image_dir = "data/images"
 
+# Folder for bounded images
+bounded_dir = os.path.join(image_dir, "bounded")
+if not os.path.exists(bounded_dir):
+    os.makedirs(bounded_dir)
+
 # Folder for cropped images
 cropped_dir = os.path.join(image_dir, "cropped")
+if not os.path.exists(cropped_dir):
+    os.makedirs(cropped_dir)
 
 # Create a dictionary to map image filenames to their classification labels
 # This will be filled in with user-provided classification values
 image_labels = {}
 
-# Create the cropped directory if it doesn't exist
-if not os.path.exists(cropped_dir):
-    os.makedirs(cropped_dir)
 
 # Define a custom dataset class that wraps the cropped images and their labels
 class AnimalDataset(Dataset):
@@ -73,13 +77,9 @@ def separate_into_sets(image_dir):
     filename = None
     
     return train_filenames, valid_filenames, test_filenames
-        
-        
-def classify_and_crop(image_dir, cropped_dir):    
-    # Initialize the AnimalDataset object
-    # Pass the `transform` argument to the constructor
-    dataset = AnimalDataset(image_dir, transform)
-    
+
+# This function is useful by itself to visualize if parameters are correct
+def bounding_boxes(image_dir, bound_dir):    
     # Step 1: Initialize model with the best available weights
     ## Change parameter here to adjust!!
     weights = FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
@@ -92,7 +92,7 @@ def classify_and_crop(image_dir, cropped_dir):
     # Call the separate_into_sets() function
     train_filenames, valid_filenames, test_filenames = separate_into_sets(image_dir)
 
-    # Process training and validation files in the image directory
+    # Process images in the directory
     for filename in train_filenames + valid_filenames:
         pass
         # Skip directories
@@ -115,9 +115,47 @@ def classify_and_crop(image_dir, cropped_dir):
         im = to_pil_image(box.detach())
 
         # Save the bounded image
-        im.save(os.path.join(cropped_dir, filename))
+        im.save(os.path.join(bounded_dir, filename))
+        
+        
+def classify_and_crop(image_dir, cropped_dir):    
+    # Initialize the AnimalDataset object
+    # Pass the `transform` argument to the constructor
+    dataset = AnimalDataset(image_dir, transform)
+    
+    # Step 1: Initialize model with the best available weights
+    ## Change parameter here to adjust!!
+    weights = FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
+    model = fasterrcnn_resnet50_fpn_v2(weights=weights, box_score_thresh=0.5)
+    model.eval()
 
+    # Step 2: Initialize the inference transforms
+    preprocess = weights.transforms()
+    
+    # Call the separate_into_sets() function
+    train_filenames, valid_filenames, test_filenames = separate_into_sets(image_dir)
 
+    # Process images in the directory
+    for filename in train_filenames + valid_filenames:
+        pass
+        # Skip directories
+        if os.path.isdir(os.path.join(image_dir, filename)):
+            continue
+
+        # Read the image
+        img = read_image(os.path.join(image_dir, filename))
+
+        # Apply inference preprocessing transforms
+        batch = [preprocess(img)]
+
+        # Use the model and visualize the prediction
+        prediction = model(batch)[0]
+        labels = [weights.meta["categories"][i] for i in prediction["labels"]]
+        box = draw_bounding_boxes(img, boxes=prediction["boxes"],
+                                  labels=labels,
+                                  colors="red",
+                                  width=4, font_size=30)
+        im = to_pil_image(box.detach())
 
         # Crop each image to the bounding box for each animal and save it to the cropped_dir directory
         for i, box in enumerate(prediction["boxes"]):
@@ -158,10 +196,18 @@ def classify_and_crop(image_dir, cropped_dir):
             dataset.add_image(os.path.join(cropped_dir, f"{filename}_{i+1}.png"), label)
 
     return train_filenames, valid_filenames, test_filenames
+
+# Ask the user if they want to run the bounding boxes function
+should_run = input("Do you want to run the bounding_boxes function? It will possibly overwrite images in data/images/cropped. (y/n)")
+
+# Check the user's response and run the function if they want to
+if should_run.lower() == "y":
+    bounding_boxes(image_dir, bounded_dir)
+else:
+    print("The bounding_boxes function will not be run at this time.")
             
-            
-# Ask the user if they want to run the function
-should_run = input("Do you want to run the classify_and_crop function? It will overwrite images in data/images/cropped. (y/n)")
+# Ask the user if they want to run the classify and crop function
+should_run = input("Do you want to run the classify_and_crop function? It will possibly overwrite images in data/images/cropped. (y/n)")
 
 # Check the user's response and run the function if they want to
 if should_run.lower() == "y":
