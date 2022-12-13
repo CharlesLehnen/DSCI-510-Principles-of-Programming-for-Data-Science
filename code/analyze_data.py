@@ -1,23 +1,26 @@
 import os
-from collections import defaultdict
 
-# Create a dictionary that uses a list
-filename_dict = defaultdict(list)
+# Create empty dict
+file_dict = {}
 
-# Set the file path
-dir_path = 'data/images/cropped'
+# Get list of files in directory
+files = os.listdir('data/images/cropped')
 
-# Iterate through filenames in the folder
-for filename in os.listdir(dir_path):
-  # Split the filename into parts
-  parts = filename.split('_')
-  
-  # Check if the filename has the expected format
-  if len(parts) == 4 and parts[0] == 'image' and parts[3].endswith('.jpg'):
-    # Create a unique key by concatenating the video_id and time_str parts
-    key = parts[1] + '_' + parts[2]
-    # Add the full filename to the list of values for the key
-    filename_dict[key].append(os.path.join(dir_path, filename))
+# Loop through the files
+for file in files:
+    # Split the filenames
+    parts = file.split('_')
+    if parts[0] == 'image':
+        video_id = parts[1]
+        timestamp = parts[2]
+        # Create a key for the dictionary using the video_id and timestamp
+        key = f"{video_id}_{timestamp}"
+        # If the key doesn't exist in the dictionary, create a new list for it
+        if key not in file_dict:
+            file_dict[key] = []
+        # Append the file path to the list of file paths for this key
+        file_dict[key].append(os.path.join('data/images/cropped', file))
 
-# Print result
-print(dict(filename_dict))
+# Print results
+print(files)
+print(file_dict)
