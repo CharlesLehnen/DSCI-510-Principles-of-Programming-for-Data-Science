@@ -10,7 +10,7 @@ capture_images_function = capture_images.capture_images
 
 if __name__ == "__main__":
     # Select capture interval for capturing images
-    capture_interval = 600
+    capture_interval = 180
 
     # Set the URLs of the YouTube live videos and run
     urls = ["https://www.youtube.com/watch?v=ydYDqZQpim8", "https://www.youtube.com/watch?v=gUZjDCZEMDA"]

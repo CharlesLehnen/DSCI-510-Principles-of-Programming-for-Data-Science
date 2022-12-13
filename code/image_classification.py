@@ -58,6 +58,20 @@ class AnimalDataset(Dataset):
         self.image_filenames.append(filename)
         self.image_labels.append(label)
 
+def split_dataset(image_dir):
+    # Get filenames and shuffle
+    filenames = [filename for filename in os.listdir(image_dir)]
+    # Remove folders
+    filenames = [filename for filename in filenames if not os.path.isdir(os.path.join(image_dir, filename))]
+    random.shuffle(filenames)
+
+    # Randomly assign approximately 70% filenames to training, 20% to validation, and %10 to test
+    train_filenames = filenames[:int(len(filenames) * 0.7)]
+    valid_filenames = filenames[int(len(filenames) * 0.7):int(len(filenames) * 0.9)]
+    test_filenames = filenames[int(len(filenames) * 0.9):]
+
+    return train_filenames, valid_filenames, test_filenames
+
 
 def classify_and_crop(image_dir, cropped_dir):    
     # Initialize the AnimalDataset object

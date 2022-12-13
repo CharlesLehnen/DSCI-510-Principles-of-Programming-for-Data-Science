@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 import multiprocessing
 from functools import partial
 
-def capture_images(url, capture_interval = 600):
+def capture_images(url, capture_interval = 300):
     
     # Extract video_id from url
     parsed_url = urlparse(url)
@@ -44,7 +44,8 @@ def capture_images(url, capture_interval = 600):
             image_number += 1
             timestamp = time.time()
             time_str = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime(timestamp))
-            image_file = os.path.join(image_folder, f"image_{video_id}_{image_number}_{time_str}.jpg")
+            image_file = os.path.join(image_folder, f"image_{video_id}_{time_str}_{image_number}.jpg")
+            #image_file = os.path.join(image_folder, f"image_{video_id}_{image_number}.jpg")
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             Image.fromarray(image).save(image_file)
             print(f"Image for video {video_id} captured")
@@ -62,7 +63,7 @@ if __name__ == "__main__":
     # Original link does not work right now: "https://www.youtube.com/watch?v=UeB6UcZpUzk"
     
     # Set interval between image captures
-    capture_interval = 120
+    capture_interval = 300
     
     with multiprocessing.Pool() as pool:
         pool.map(partial(capture_images, capture_interval = capture_interval), urls)
