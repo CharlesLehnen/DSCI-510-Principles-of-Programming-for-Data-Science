@@ -23,15 +23,15 @@ for file in files:
         file_dict[key].append(os.path.join('data/images/cropped', file))
 
 # Print results
-print(files)
-print(file_dict)
+# print(files)
+# print(file_dict)
 
 # Create pandas dataframe from the dictionary
 df = pd.DataFrame(columns=['video_id', 'timestamp', 'count'])
 for key, value in file_dict.items():
-    timestamp = key
     count = len(value)
-    df = pd.concat([df, {'video_id': video_id, 'timestamp': timestamp, 'count': count}], ignore_index=True)
+    new_df = pd.DataFrame({'video_id': [video_id], 'timestamp': [timestamp], 'count': [count]})
+    df = pd.concat([df, new_df], ignore_index=True)
 
 # Print the dataframe
 df
