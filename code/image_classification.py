@@ -58,21 +58,23 @@ class AnimalDataset(Dataset):
         self.image_filenames.append(filename)
         self.image_labels.append(label)
 
-def split_dataset(image_dir):
-    # Get filenames and shuffle
+def separate_into_sets(image_dir):
+    ## Get filenames and shuffle
     filenames = [filename for filename in os.listdir(image_dir)]
     # Remove folders
     filenames = [filename for filename in filenames if not os.path.isdir(os.path.join(image_dir, filename))]
     random.shuffle(filenames)
 
-    # Randomly assign approximately 70% filenames to training, 20% to validation, and %10 to test
+    ## Randomly assign approximately 70% filenames to training, 20% to validation, and %10 to test
     train_filenames = filenames[:int(len(filenames) * 0.7)]
     valid_filenames = filenames[int(len(filenames) * 0.7):int(len(filenames) * 0.9)]
     test_filenames = filenames[int(len(filenames) * 0.9):]
-
+    
+    filename = None
+    
     return train_filenames, valid_filenames, test_filenames
-
-
+        
+        
 def classify_and_crop(image_dir, cropped_dir):    
     # Initialize the AnimalDataset object
     # Pass the `transform` argument to the constructor
@@ -86,21 +88,9 @@ def classify_and_crop(image_dir, cropped_dir):
 
     # Step 2: Initialize the inference transforms
     preprocess = weights.transforms()
-
-    # Separate into sets
     
-    ## Get filenames and shuffle
-    filenames = [filename for filename in os.listdir(image_dir)]
-    # Remove folders
-    filenames = [filename for filename in filenames if not os.path.isdir(os.path.join(image_dir, filename))]
-    random.shuffle(filenames)
-
-    ## Randomly assign approximately 70% filenames to training, 20% to validation, and %10 to test
-    train_filenames = filenames[:int(len(filenames) * 0.7)]
-    valid_filenames = filenames[int(len(filenames) * 0.7):int(len(filenames) * 0.9)]
-    test_filenames = filenames[int(len(filenames) * 0.9):]
-    
-    filename = None
+    # Call the separate_into_sets() function
+    train_filenames, valid_filenames, test_filenames = separate_into_sets(image_dir)
 
     # Process training and validation files in the image directory
     for filename in train_filenames + valid_filenames:
@@ -166,12 +156,12 @@ def classify_and_crop(image_dir, cropped_dir):
 
             # Add the image and label to the dataset
             dataset.add_image(os.path.join(cropped_dir, f"{filename}_{i+1}.png"), label)
-            
+
     return train_filenames, valid_filenames, test_filenames
             
             
 # Ask the user if they want to run the function
-should_run = input("Do you want to run the classify_and_crop function? (y/n)")
+should_run = input("Do you want to run the classify_and_crop function? It will overwrite images in data/images/cropped. (y/n)")
 
 # Check the user's response and run the function if they want to
 if should_run.lower() == "y":
