@@ -34,14 +34,31 @@ for key, value in file_dict.items():
     new_df = pd.DataFrame({'video_id': [video_id], 'timestamp': [timestamp], 'count': [count]})
     df = pd.concat([df, new_df], ignore_index=True)
 
+
+    
 # Set the video_id column as the index of the dataframe
 df = df.set_index('video_id')
 
 # Convert the timestamp column to a datetime object
-df['timestamp'] = pd.to_datetime(df['timestamp'], format='%Y-%m-%d_%H-%M-%S')
+df['timestamp'] = pd.to_datetime(df['timestamp'].values, format='%Y-%m-%d_%H-%M-%S')
 
-# Group the data by timestamp and aggregate the counts
-df = df.groupby('timestamp')['count'].sum()
+# Convert the 'count' column to a numerical data type
+df['count'] = pd.to_numeric(df['count'])
 
-# Plot the time series using seaborn
-sns.lineplot(data=df)
+print(df.dtypes)
+
+
+# # Group the data by timestamp and aggregate the counts
+# df = df.groupby('timestamp')['count'].sum()
+
+# # Set the style of the plot
+# sns.set_style('darkgrid')
+
+# # Create the lineplot
+# ax = sns.lineplot(x=df['timestamp'].values, y=df['count'].values)
+
+# # Set the labels for the x and y axes
+# ax.set(xlabel='Timestamp', ylabel='Count')
+
+# # Show the plot
+# plt.show()
