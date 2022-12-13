@@ -10,6 +10,7 @@ from torch.utils.data import Dataset
 from torchvision.transforms import ToTensor, Compose
 from matplotlib.pyplot import imshow
 from torchvision.transforms.functional import to_pil_image
+import string
 
 # Folder containing images to process
 image_dir = "data/images"
@@ -179,13 +180,17 @@ def classify_and_crop(image_dir, cropped_dir):
             # Save the image
             path = os.path.join(cropped_dir, f"{filename.replace('.jpg', '')}_{i}.jpg")
             cropped_im.save(path)
-
-            # Show the image
-            img = Image.open(path)
-            img.show()
             
-            # Ask the user to classify the detected object
-            label = input(f"Enter a classification label for the object in box {i+1}: ")
+#             # Show the image
+#             img = Image.open(path)
+#             img.show()
+            
+#             # Ask the user to classify the detected object
+#             label = input(f"Enter a classification label for the object in box {i+1}: ")
+
+            # This is to speed run through fake version of the process
+            label = "test"
+            
             if label not in image_labels:
                 # If the label does not exist in the dictionary, add it
                 image_labels[label] = []
