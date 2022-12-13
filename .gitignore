@@ -131,4 +131,5 @@ dmypy.json
 data/images/*
 data/images/Images_Backup*
 Test.ipynb
+*.jpg
 

@@ -42,7 +42,9 @@ def capture_images(url, capture_interval = 600):
 
         while success:
             image_number += 1
-            image_file = os.path.join(image_folder, f"image_{video_id}_{image_number}.jpg")
+            timestamp = time.time()
+            time_str = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime(timestamp))
+            image_file = os.path.join(image_folder, f"image_{video_id}_{image_number}_{time_str}.jpg")
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             Image.fromarray(image).save(image_file)
             print(f"Image for video {video_id} captured")
