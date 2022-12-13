@@ -153,7 +153,7 @@ def classify_and_crop(image_dir, cropped_dir):
         labels = [weights.meta["categories"][i] for i in prediction["labels"]]
         box = draw_bounding_boxes(img, boxes=prediction["boxes"],
                                   labels=labels,
-                                  colors="red",
+                                  colors=(255, 0, 0, 0),  # Red with 100% transparency
                                   width=4, font_size=30)
         im = to_pil_image(box.detach())
 
@@ -177,7 +177,7 @@ def classify_and_crop(image_dir, cropped_dir):
             cropped_im = crop(im, top, left, height, width)
 
             # Save the image
-            path = os.path.join(cropped_dir, f"{filename}_{i}.jpg")
+            path = os.path.join(cropped_dir, f"{filename.replace('.jpg', '')}_{i}.jpg")
             cropped_im.save(path)
 
             # Show the image
