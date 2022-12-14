@@ -15,7 +15,88 @@ There is not yet a publicly available labelling dataset for African megafauna in
 
 # Dependencies
 
-This project was created and developed within a *minicoda* environment. All dependencies, including versions, that were used in the development of this project can be found in the `requirements.txt` file, which can be found in the root directory of the [project GitHub](https://github.com/CharlesLehnen/DSCI-510-Principles-of-Programming-for-Data-Science). The dependencies are listed here as well:
+This project was created and developed within a *minicoda* environment. All dependencies, including versions, that were used in the development of this project can be found in the `requirements.txt` file, which can be found in the root directory of the [project GitHub](https://github.com/CharlesLehnen/DSCI-510-Principles-of-Programming-for-Data-Science). For your reference, dependencies are listed in the appendix of this `README` file as.
+
+# Running the project
+
+1) Install dependencies:
+
+```
+pip install -r requirements.txt
+```
+
+
+2) After installation of dependencies, you will call the files `download_videos.py` and `capture_images.py` by calling the single file:
+
+```
+python code/main.py
+```
+
+3) You will need to enter `Ctrl C` on your keyboard to terminate `youtube-dl`. This library evades all other methods to terminate unless the video has ended, which is not the case with 24/7 live cameras, so manual termination is required. Results can be viewed in the `code\data\videos` and `code\data\images` folders. 
+
+4) If you are satisfied with the images, you can begin the classification process. First the program will prompt you to ask if you would like to generate full images that include bounding boxes around invidual animals. If you select `y`, you can view the results is the `code\data\images\bounded` directory. These images are useful for deciding if model parameters should be changed. Then, the program will ask if you would like to begin manual classification of images. If you select `y`, results of images features only invidual animals from a given images can be found in the folder `code\data\images\cropped`. This proess is begun by calling:
+
+```
+python code/image_classification.py
+```
+
+5) Once completed, you can run the preliminary analysis code. For purposes of visualization, it is recommended that the analysis be conducted in the Jupyter Notebook version of the analyses files which can be found at `code\analyze_data.ipynb`. 
+
+
+# Methodology
+
+## Imagery capture
+
+I studied parallel processing in order to develop a program that could capture multiple videos and gather images from them in real-time using a `multiprocessing` workflow. Using `youtube-dl`, videos are captured for up to 6 hours at a time without timing out. Note that the `youtube-dl` program **must** be terminated manually with `Ctrl + C`. This program must be run overnight because of the difference in African timezones compared to the United States. I originally wanted this code to begin and stop each night automatically, but it does not seem like that is possible with the way that `youtube-dl` operates.
+
+The streams [Namibia: Live stream in the Namib Desert](https://www.youtube.com/watch?v=ydYDqZQpim8) and [Africam Nkorho Bush Lodge powered by EXPLORE.org](https://www.youtube.com/watch?v=gUZjDCZEMDA) were used, although the code is designed so that many more urls could be passed in and be processed in parallel. A third live stream, [Tembe Elephant Park, South Africa](https://www.youtube.com/watch?v=UeB6UcZpUz) was originally use, but this link is no longer active. In order to not lose resolution with image capture, videos are high quality `.mp4` files by preserving highest quality of sources (1080p).
+
+I utlized what I had learned about parrallel processing to capture images from the YouTube livestreams in real time. In order to have diversity in the images captured, I set my parameters to capture images every 10 minutes. Images were collected as `.jpg` files, stored in the `./code/data/images` folder of my directory. The program checks which files are in the folder before beginning so that it does not overwrite existing files so that it can be run on sequential nights without supervision. A selection of some images are included for your review.
+
+Applying the concepts learned in class, both the `download_videos.py` and `capture_images.py` scripts can be run independently from one another using the `if __name__ == "__main__":` class definition. However, I designed these scripts intentionally to run simultaneously so that realtime analysis could be conducted. The parallel processing of these scripts is deployed by running the `get_data.py` script which calls in the functions defined in the `download_videos.py` and `capture_images.py` scripts.
+
+I had collected over 12 hours of video, running this program overnight because of timezone differences, and hundreds of associated images before I shifted my methodologies to include taking timepoints at the moment of image capture in order to conduct further analyses with this information. Since that time, I have collected an additional 12 hours of video and 265 associated images. This resulted in 18,200 cropped images of individual animals that could theoretically be used for classification. 
+
+## Image classification
+
+Using the `torchvision` *FasterRCNN_ResNet50_FPN_V2* model that was presented in class, labelled bounding boxes were applied to the captured images. There is not a classifier built for African wildlife, so the COCO classification library was used to label animals more generally. In line with the concept of functional programming, primary functionality is stored in the `classify_and_crop` function so that it could be used elsewhere. For the same reason, the functions `separate_into_sets`, which divides filepaths randomly into training, validation, and test sets, as well as the bounding box drawing function `bounding_boxes` are now separated out into their own functions. When this program is called, the user is prompted whether they want to run the program or not before beginning, because the program may overwrite existing files.
+
+Following object oriented programming principles, the `Dataset` class of the `Pytorch` was extended to make the `AnimalDataset` class which stores classified labels in a specific format that will be easily readable by a classifier like *Faster RCNN* to generate a customized model to species of interest. I had hoped to generate a large enough dataset to run a preliminary test of customizing the classifier with my data. However, I found that I needed far more than I could produce in this time period.
+
+# Visualization
+
+Beyond the visualizations of bounding boxes and cropped images from the classification workflow, the following analyses were also conducted. As you run the code, you will not have access to the same images because of the upload limits. However, examples of my output can be found in the `results` directory.
+
+In general, I had hoped to have more continous datasets for these analyses. However, I was able to truncate the dataset through `pandas` filtering in order to analyze a biologically interesting time period of mid-day to dusk.
+
+## Timeseries
+
+A line plot for each site was plotted over time, This timeseries analysis showed a similar trend in activity between the two sites. Activity, as inferred by number of individuals, decreases from 1:30pm to 5:00pm across sites.   
+## PCA
+
+An interative 3D PCA can give further insight into the activity patterns of animals at the studied sites. Viewed from above, it is visible that ther is likely a difference in how animals respond to the change of hour on a given day. This initial observation could inspire a study into why these difference exist.
+
+As an advanced visualization, by creating an interactive 3D plot, the complexity of the ecosystem can be better understood, as seen in the interplay between three variables. The reason this plot is so powerful is that because the plot is interactive, complex multi-dimensional relationshps can be more easily explored.
+
+## Linear regression
+
+In order to quantify the correlation between the count of animals and the time of day, a simple correlation analysis was conducted. The similar slopes in the trends between sites are inline with the trend in the time series. However, the trendlines are offset, which is in agreement with the above view of the PCA plot. Altogether, there is a similar response of animals to the changing times of the day across these two sites, however these responses are not identical even though these sites are geographically similar with overlapping species and common climatic conditions. It would be interesting to study why these similarities/differences may be occuring.
+
+These initial analyses encourage further inquiry, but because of the short sampling period of two days, statstical significance cannot be derived from any of the exploratory analyses detailed here.
+
+# Future Work
+
+The analyses detalied about could provide information that would inform biologist seeking to collect appropriate field data, conservations on the need to adjust monitoring counts depending on the time of day, and even tour operators seeking to maximize the exposure of clients to wildlife. With more time, a classification dataset could be generated. I would then use the training and validation sets can be used to make a customized classifier. The accuracy of this classifier would be tested on the test set. This dataset would then be used to create a custom classifier built on the *FasterRCNN_ResNet50_FPN_V2* model. A well trained classifier requires the manual classification of 10,000+ images. This large quantity of images can be difficult to obtain, especially of subjects at different angles, moving differently, in different lighting, etc. By screencapturing from livestreams, thousands of a large variety of images can be produced. Because I designed this program using parallel processing techniques, multiple YouTube livestreams can be captured all while being manually classified nearly simultaneously by running the `get_data.py` and `image_classification` programs at the same time. Manual classification could potentially even constitute an undergraduate research project. Through USC's undergraduate research program, a small group of students could aid in this research by manually classifying wildlife and, in doing so, learn about principles of animal behavior, ecology, machine learning, and programming.
+
+After species are identififed and quantified in each image, more complex ecological analyses could be conducted. The alpha and beta diversity of species between sites could be compared and the trends observed could be correlated with other factors to explore ecological questions.
+
+Beyond my interest in this project as an important tool for my own doctoral research, this individual project could be furthter developed upon to become a useful tool. It could be run for many days during different seasons to analyze changing distributions of animals. Because it is conducted in realtime, could be used to inform conservation efforts or even aid in the response to poaching. This tool would be particularly for behavioral ecologists who could use a program like this to analyze behavior at set timepoints, a common methodology called "point sampling," instead of having to do so in the field.
+
+It could feasibly be further developed to properly train a classifier of African wildlife following some further development and by running for long periods of time for multiple YouTube streams. 
+
+Additionally, I will also use this model in my own dissertation work to classify images of tortoises, iguanas, and no animals in order to make the analysis of camera trap data much more efficient.
+
+# Appendix
 
 ```
 # This file may be used to create an environment using:
@@ -266,82 +347,3 @@ zeromq=4.3.4=h0e60522_1
 zipp=3.11.0=pyhd8ed1ab_0
 zstd=1.5.2=h7755175_4
 ```
-
-# Running the project
-
-1) Install dependencies:
-
-```
-pip install -r requirements.txt
-```
-
-
-2) After installation of dependencies, you will call the files `download_videos.py` and `capture_images.py` by calling the single file:
-
-```
-python code/main.py
-```
-
-3) You will need to enter `Ctrl C` on your keyboard to terminate `youtube-dl`. This library evades all other methods to terminate unless the video has ended, which is not the case with 24/7 live cameras, so manual termination is required. Results can be viewed in the `code\data\videos` and `code\data\images` folders. 
-
-4) If you are satisfied with the images, you can begin the classification process. First the program will prompt you to ask if you would like to generate full images that include bounding boxes around invidual animals. If you select `y`, you can view the results is the `code\data\images\bounded` directory. These images are useful for deciding if model parameters should be changed. Then, the program will ask if you would like to begin manual classification of images. If you select `y`, results of images features only invidual animals from a given images can be found in the folder `code\data\images\cropped`. This proess is begun by calling:
-
-```
-python code/image_classification.py
-```
-
-5) Once completed, you can run the preliminary analysis code. For purposes of visualization, it is recommended that the analysis be conducted in the Jupyter Notebook version of the analyses files which can be found at `code\analyze_data.ipynb`. 
-
-
-# Methodology
-
-## Imagery capture
-
-I studied parallel processing in order to develop a program that could capture multiple videos and gather images from them in real-time using a `multiprocessing` workflow. Using `youtube-dl`, videos are captured for up to 6 hours at a time without timing out. Note that the `youtube-dl` program **must** be terminated manually with `Ctrl + C`. This program must be run overnight because of the difference in African timezones compared to the United States. I originally wanted this code to begin and stop each night automatically, but it does not seem like that is possible with the way that `youtube-dl` operates.
-
-The streams [Namibia: Live stream in the Namib Desert](https://www.youtube.com/watch?v=ydYDqZQpim8) and [Africam Nkorho Bush Lodge powered by EXPLORE.org](https://www.youtube.com/watch?v=gUZjDCZEMDA) were used, although the code is designed so that many more urls could be passed in and be processed in parallel. A third live stream, [Tembe Elephant Park, South Africa](https://www.youtube.com/watch?v=UeB6UcZpUz) was originally use, but this link is no longer active. In order to not lose resolution with image capture, videos are high quality `.mp4` files by preserving highest quality of sources (1080p).
-
-I utlized what I had learned about parrallel processing to capture images from the YouTube livestreams in real time. In order to have diversity in the images captured, I set my parameters to capture images every 10 minutes. Images were collected as `.jpg` files, stored in the `./code/data/images` folder of my directory. The program checks which files are in the folder before beginning so that it does not overwrite existing files so that it can be run on sequential nights without supervision. A selection of some images are included for your review.
-
-Applying the concepts learned in class, both the `download_videos.py` and `capture_images.py` scripts can be run independently from one another using the `if __name__ == "__main__":` class definition. However, I designed these scripts intentionally to run simultaneously so that realtime analysis could be conducted. The parallel processing of these scripts is deployed by running the `get_data.py` script which calls in the functions defined in the `download_videos.py` and `capture_images.py` scripts.
-
-I had collected over 12 hours of video, running this program overnight because of timezone differences, and hundreds of associated images before I shifted my methodologies to include taking timepoints at the moment of image capture in order to conduct further analyses with this information. Since that time, I have collected an additional 12 hours of video and 265 associated images. This resulted in 18,200 cropped images of individual animals that could theoretically be used for classification. 
-
-## Image classification
-
-Using the `torchvision` *FasterRCNN_ResNet50_FPN_V2* model that was presented in class, labelled bounding boxes were applied to the captured images. There is not a classifier built for African wildlife, so the COCO classification library was used to label animals more generally. In line with the concept of functional programming, primary functionality is stored in the `classify_and_crop` function so that it could be used elsewhere. For the same reason, the functions `separate_into_sets`, which divides filepaths randomly into training, validation, and test sets, as well as the bounding box drawing function `bounding_boxes` are now separated out into their own functions. When this program is called, the user is prompted whether they want to run the program or not before beginning, because the program may overwrite existing files.
-
-Following object oriented programming principles, the `Dataset` class of the `Pytorch` was extended to make the `AnimalDataset` class which stores classified labels in a specific format that will be easily readable by a classifier like *Faster RCNN* to generate a customized model to species of interest. I had hoped to generate a large enough dataset to run a preliminary test of customizing the classifier with my data. However, I found that I needed far more than I could produce in this time period.
-
-# Visualization
-
-Beyond the visualizations of bounding boxes and cropped images from the classification workflow, the following analyses were also conducted. As you run the code, you will not have access to the same images because of the upload limits. However, examples of my output can be found in the `results` directory.
-
-In general, I had hoped to have more continous datasets for these analyses. However, I was able to truncate the dataset through `pandas` filtering in order to analyze a biologically interesting time period of mid-day to dusk.
-
-## Timeseries
-
-A line plot for each site was plotted over time, This timeseries analysis showed a similar trend in activity between the two sites. Activity, as inferred by number of individuals, decreases from 1:30pm to 5:00pm across sites.   
-## PCA
-
-An interative 3D PCA can give further insight into the activity patterns of animals at the studied sites. Viewed from above, it is visible that ther is likely a difference in how animals respond to the change of hour on a given day. This initial observation could inspire a study into why these difference exist.
-
-As an advanced visualization, by creating an interactive 3D plot, the complexity of the ecosystem can be better understood, as seen in the interplay between three variables. The reason this plot is so powerful is that because the plot is interactive, complex multi-dimensional relationshps can be more easily explored.
-
-## Linear regression
-
-In order to quantify the correlation between the count of animals and the time of day, a simple correlation analysis was conducted. The similar slopes in the trends between sites are inline with the trend in the time series. However, the trendlines are offset, which is in agreement with the above view of the PCA plot. Altogether, there is a similar response of animals to the changing times of the day across these two sites, however these responses are not identical even though these sites are geographically similar with overlapping species and common climatic conditions. It would be interesting to study why these similarities/differences may be occuring.
-
-These initial analyses encourage further inquiry, but because of the short sampling period of two days, statstical significance cannot be derived from any of the exploratory analyses detailed here.
-
-# Future Work
-
-The analyses detalied about could provide information that would inform biologist seeking to collect appropriate field data, conservations on the need to adjust monitoring counts depending on the time of day, and even tour operators seeking to maximize the exposure of clients to wildlife. With more time, a classification dataset could be generated. I would then use the training and validation sets can be used to make a customized classifier. The accuracy of this classifier would be tested on the test set. This dataset would then be used to create a custom classifier built on the *FasterRCNN_ResNet50_FPN_V2* model. A well trained classifier requires the manual classification of 10,000+ images. This large quantity of images can be difficult to obtain, especially of subjects at different angles, moving differently, in different lighting, etc. By screencapturing from livestreams, thousands of a large variety of images can be produced. Because I designed this program using parallel processing techniques, multiple YouTube livestreams can be captured all while being manually classified nearly simultaneously by running the `get_data.py` and `image_classification` programs at the same time. Manual classification could potentially even constitute an undergraduate research project. Through USC's undergraduate research program, a small group of students could aid in this research by manually classifying wildlife and, in doing so, learn about principles of animal behavior, ecology, machine learning, and programming.
-
-After species are identififed and quantified in each image, more complex ecological analyses could be conducted. The alpha and beta diversity of species between sites could be compared and the trends observed could be correlated with other factors to explore ecological questions.
-
-Beyond my interest in this project as an important tool for my own doctoral research, this individual project could be furthter developed upon to become a useful tool. It could be run for many days during different seasons to analyze changing distributions of animals. Because it is conducted in realtime, could be used to inform conservation efforts or even aid in the response to poaching. This tool would be particularly for behavioral ecologists who could use a program like this to analyze behavior at set timepoints, a common methodology called "point sampling," instead of having to do so in the field.
-
-It could feasibly be further developed to properly train a classifier of African wildlife following some further development and by running for long periods of time for multiple YouTube streams. 
-
-Additionally, I will also use this model in my own dissertation work to classify images of tortoises, iguanas, and no animals in order to make the analysis of camera trap data much more efficient.
