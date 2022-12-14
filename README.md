@@ -1,4 +1,4 @@
-# Building a Largescale Classification Dataset of African Megafauna from YouTube Livestreams Using Computer Vision
+# Building the Foundation of a Largescale Classification Dataset for African Megafauna from YouTube Livestreams Using Computer Vision
 
 For my doctoral research, I am investigating the evolutionary and ecology relationship betweenGiant Galapagos tortoises (*Chelonoidis niger sspp.*) and Galapagos land iguanas (*Conolophus spp.*). As an aspect of this work, I will be stationing trail cameras on Santa Fe Island to observe and compare feeding habitats. In order to analyze this data, I will separate video footage into images, classify these images based on which species is present, and then analyze the behavior seen in each image. In order to develop this workflow, I wrote a program to capture images from a video at set intervals. Then, in order to analyze this data, I will separate video footage into images, classify these images based on which species is present, and then analyze the behavior seen in each image. To dramatically improve efficiency, a classification program will be very useful, so I developed the foundation of one.
 
