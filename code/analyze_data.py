@@ -1,5 +1,7 @@
 import seaborn as sns
+from seaborn import FacetGrid
 import pandas as pd
+import matplotlib.pyplot as plt
 import os
 
 # Create empty dict
@@ -36,22 +38,9 @@ df = pd.DataFrame(rows, columns=["video_id", "timestamp", "count"])
 df['timestamp']=pd.to_datetime(df['timestamp'],format='%Y-%m-%d_%H-%M-%S')
 
 
-    
-# # Set the video_id column as the index of the dataframe
-# df = df.set_index('video_id')
+# Set the timestamp column as the index of the dataframe
+df.set_index("timestamp", inplace=True)
 
-
-# # Group the data by timestamp and aggregate the counts
-# df = df.groupby('timestamp')['count'].sum()
-
-# # Set the style of the plot
-# sns.set_style('darkgrid')
-
-# # Create the lineplot
-# ax = sns.lineplot(x=df['timestamp'].values, y=df['count'].values)
-
-# # Set the labels for the x and y axes
-# ax.set(xlabel='Timestamp', ylabel='Count')
-
-# # Show the plot
-# plt.show()
+# Use seaborn to plot the timeseries
+sns.lineplot(data=df)
+plt.xticks(rotation=45)
