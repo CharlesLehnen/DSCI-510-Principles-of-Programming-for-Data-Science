@@ -37,10 +37,9 @@ for key, value in file_dict.items():
 df = pd.DataFrame(rows, columns=["video_id", "timestamp", "count"])
 df['timestamp']=pd.to_datetime(df['timestamp'],format='%Y-%m-%d_%H-%M-%S')
 
+# Group the data by video_id and timestamp, and calculate the count for each group
+df_plot = df.groupby(['video_id', 'timestamp'])['count'].sum().reset_index()
 
-# Set the timestamp column as the index of the dataframe
-df.set_index("timestamp", inplace=True)
-
-# Use seaborn to plot the timeseries
-sns.lineplot(data=df)
-plt.xticks(rotation=45)
+# Use seaborn to create a timeseries plot with timestamp in the x-axis and count in the y-axis
+sns.set_style("darkgrid")
+sns.lineplot(x="timestamp", y="count", hue="video_id", data=df_plot)
