@@ -1,6 +1,6 @@
-import os
-import pandas as pd
 import seaborn as sns
+import pandas as pd
+import os
 
 # Create empty dict
 file_dict = {}
@@ -22,30 +22,23 @@ for file in files:
             file_dict[key] = []
         # Append the file path to the list of file paths for this key
         file_dict[key].append(os.path.join('data/images/cropped', file))
-
-# Print results
-# print(files)
-# print(file_dict)
-
-# Create pandas dataframe from the dictionary
-df = pd.DataFrame(columns=['video_id', 'timestamp', 'count'])
+        
+# Convert to Pandas dataframe
+rows = []
 for key, value in file_dict.items():
+    video_id = key.split("_")[0]
+    timestamp = key.split("_")[1] + "_" + key.split("_")[2]
     count = len(value)
-    new_df = pd.DataFrame({'video_id': [video_id], 'timestamp': [timestamp], 'count': [count]})
-    df = pd.concat([df, new_df], ignore_index=True)
+    rows.append((video_id, timestamp, count))
+
+
+df = pd.DataFrame(rows, columns=["video_id", "timestamp", "count"])
+df['timestamp']=pd.to_datetime(df['timestamp'],format='%Y-%m-%d_%H-%M-%S')
 
 
     
-# Set the video_id column as the index of the dataframe
-df = df.set_index('video_id')
-
-# Convert the timestamp column to a datetime object
-df['timestamp'] = pd.to_datetime(df['timestamp'].values, format='%Y-%m-%d_%H-%M-%S')
-
-# Convert the 'count' column to a numerical data type
-df['count'] = pd.to_numeric(df['count'])
-
-print(df.dtypes)
+# # Set the video_id column as the index of the dataframe
+# df = df.set_index('video_id')
 
 
 # # Group the data by timestamp and aggregate the counts
