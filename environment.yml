@@ -57,4 +57,11 @@ dependencies:
   - youtube-dl=2021.12.17=pyhd8ed1ab_0
   - zlib=1.2.13=h8cc25b3_0
   - zstd=1.5.5=hd43e919_0
+  - pip:
+      - brotli==1.0.9
+      - certifi==2023.7.22
+      - mutagen==1.46.0
+      - pycryptodomex==3.18.0
+      - websockets==11.0.3
+      - yt-dlp==2023.7.6
 prefix: c:\Users\lehnen\Desktop\GitHub\DSCI-510-Principles-of-Programming-for-Data-Science\.conda
