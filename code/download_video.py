@@ -7,8 +7,30 @@ import time
 import os
 import cv2
 from PIL import Image
+import platform
 
 def download_video(url):
+
+    # Add youtube-dl to system PATH
+    ## Determine the operating system
+    os_type = platform.system()
+
+    ## Get the path to youtube-dl based on the operating system
+    if os_type == "Windows":
+        try:
+            youtube_dl_path = subprocess.check_output(["where", "youtube-dl"], text=True).strip()
+        except subprocess.CalledProcessError:
+            print("youtube-dl not found. Please install it.")
+            exit(1)
+    else:  # For Linux and macOS
+        try:
+            youtube_dl_path = subprocess.check_output(["which", "youtube-dl"], text=True).strip()
+        except subprocess.CalledProcessError:
+            print("youtube-dl not found. Please install it.")
+    ## Add the directory containing youtube-dl to the PATH
+    os.environ["PATH"] += os.pathsep + os.path.dirname(youtube_dl_path)
+
+    # Download video
     try :
          # Set up folder and file structure using absolute paths
         base_dir = os.path.abspath(os.getcwd())
