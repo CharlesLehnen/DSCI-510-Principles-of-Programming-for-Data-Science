@@ -1,1 +1,2 @@
 numpy @ file:///D:/bld/numpy_1651020764721/work
+Pillow==9.4.0
