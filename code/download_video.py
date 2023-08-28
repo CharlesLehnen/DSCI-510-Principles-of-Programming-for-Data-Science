@@ -10,17 +10,10 @@ from PIL import Image
 
 def download_video(url):
     try :
-        # Print current working directory for debugging
-        print(f"Current working directory: {os.getcwd()}")
-
-        # Set up folder and file structure using absolute paths
+         # Set up folder and file structure using absolute paths
         base_dir = os.path.abspath(os.getcwd())
         data_folder = os.path.join(base_dir, "data")
         video_folder = os.path.join(data_folder, "videos")
-
-        # Print paths for debugging
-        print(f"Data folder: {data_folder}")
-        print(f"Video folder: {video_folder}")
 
         if not os.path.exists(data_folder):
             os.mkdir(data_folder)
