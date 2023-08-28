@@ -1,2 +1,3 @@
 numpy @ file:///D:/bld/numpy_1651020764721/work
 Pillow==9.4.0
+youtube-dl @ file:///home/conda/feedstock_root/build_artifacts/youtube-dl_1640026230460/work
