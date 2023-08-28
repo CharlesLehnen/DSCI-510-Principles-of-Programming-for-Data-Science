@@ -13,8 +13,8 @@ if __name__ == "__main__":
     capture_interval = 180
 
     # Set the URLs of the YouTube live videos and run
-    urls = ["https://www.youtube.com/watch?v=ydYDqZQpim8", "https://www.youtube.com/watch?v=gUZjDCZEMDA"]
-        # Original link I wanted does not work right now: "https://www.youtube.com/watch?v=UeB6UcZpUzk"
+    urls = ["https://www.youtube.com/watch?v=ydYDqZQpim8"]
+        # Original links I wanted does not work right now: "https://www.youtube.com/watch?v=UeB6UcZpUzk", "https://www.youtube.com/watch?v=gUZjDCZEMDA"
 
     with multiprocessing.Pool() as pool:
         # use partial() so I can feed in keyword args

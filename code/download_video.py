@@ -8,10 +8,10 @@ import os
 import cv2
 from PIL import Image
 
-def is_youtube_dl_installed():
-    """Check if youtube-dl is installed."""
+def is_yt-dlp_installed():
+    # Check if yt-dlp is installed.
     try:
-        subprocess.check_output(["youtube-dl", "--version"], stderr=subprocess.STDOUT)
+        subprocess.check_output(["yt-dlp", "--version"], stderr=subprocess.STDOUT)
         return True
     except subprocess.CalledProcessError:
         return False
@@ -34,7 +34,8 @@ def download_video(url):
         # Download video
         video_output = os.path.join(os.getcwd(), "data", "videos")
         command = [
-            "youtube-dl",
+            "yt-dlp",
+            "--print-traffic",
             "--verbose",
             "--output", f"{video_output}/video_%(id)s.%(ext)s", # This fixed the default naming conflict errors
             "--no-part", # This fixed the .mp4.part issue
@@ -45,20 +46,19 @@ def download_video(url):
     # This is the only way to accomplish this! I tried everything
     except KeyboardInterrupt:
         # Kill the youtube-dl process
-        youtube_dl_process.terminate()
         download_process.terminate()
 
     
 if __name__ == "__main__":
-    # Check if youtube-dl is installed
-    if not is_youtube_dl_installed():
-        print("Error: youtube-dl is not installed.")
-        print("Please install it using: pip install youtube-dl")
+    # Check if yt-dlp is installed
+    if not is_yt-dlp_installed():
+        print("Error: yt-dlp is not installed.")
+        print("Please install it using: pip install yt-dlp")
         exit(1)
     
     # Set the URLs of the YouTube live videos and run
-    urls = ["https://www.youtube.com/watch?v=ydYDqZQpim8"]
-    # Original link does not work right now: "https://www.youtube.com/watch?v=UeB6UcZpUzk"
+    urls = ["https://www.youtube.com/watch?v=ydYDqZQpim8", "https://www.youtube.com/watch?v=DsNtwGJXTTs"]
+    # Original link does not work right now: "https://www.youtube.com/watch?v=UeB6UcZpUzk", "https://www.youtube.com/watch?v=gUZjDCZEMDA"
     
     # Run function
     with multiprocessing.Pool() as pool:
