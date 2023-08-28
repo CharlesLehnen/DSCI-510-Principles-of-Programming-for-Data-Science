@@ -8,7 +8,7 @@ import os
 import cv2
 from PIL import Image
 
-def is_yt-dlp_installed():
+def is_yt_dlp_installed():
     # Check if yt-dlp is installed.
     try:
         subprocess.check_output(["yt-dlp", "--version"], stderr=subprocess.STDOUT)
@@ -46,12 +46,12 @@ def download_video(url):
     # This is the only way to accomplish this! I tried everything
     except KeyboardInterrupt:
         # Kill the youtube-dl process
-        download_process.terminate()
+        pass
 
     
 if __name__ == "__main__":
     # Check if yt-dlp is installed
-    if not is_yt-dlp_installed():
+    if not is_yt_dlp_installed():
         print("Error: yt-dlp is not installed.")
         print("Please install it using: pip install yt-dlp")
         exit(1)
