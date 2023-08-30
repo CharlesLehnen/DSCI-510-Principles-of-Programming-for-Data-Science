@@ -23,8 +23,9 @@ def capture_images(url, capture_interval = 300):
 
         # Set the output and image folders
         video_output = os.path.join(script_dir, "data", "videos")
-        image_folder = os.path.join(script_dir, "data", "images")
+        video_file_path = os.path.join(video_output, f"video_{video_id}.mp4")
 
+        image_folder = os.path.join(script_dir, "data", "images")
         if not os.path.exists(image_folder):
             os.mkdir(image_folder)
 
