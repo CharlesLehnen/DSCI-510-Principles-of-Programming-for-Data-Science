@@ -14,26 +14,33 @@ def capture_images(url, capture_interval = 300):
     
     # Capture images from the video
     try:
+        # Get the directory of the current script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Extract video_id from url
+        parsed_url = urlparse(url)
+        video_id = parsed_url.query.split("&")[0].split("=")[1]
+
         # Set the output and image folders
-        video_output = os.path.join(os.getcwd(), "data", "videos")
-        image_folder = os.path.join("data", "images")
+        video_output = os.path.join(script_dir, "data", "videos")
+        image_folder = os.path.join(script_dir, "data", "images")
+
         if not os.path.exists(image_folder):
             os.mkdir(image_folder)
         
         # Code to start at image name that was left off at
-        
         image_files = os.listdir(image_folder)
         ## Filter, extract, and sort
         image_files = [f for f in image_files if f.startswith(f"image_{video_id}_") and f.endswith(".jpg")]
         image_numbers = [int(f.split("_")[-1].split(".")[0]) for f in image_files]
         image_numbers.sort()
 
-        ## Extract number from last image
-        last_image_number = image_numbers[-1]
-        
+        ## Extract number from last image or set to 0 if no images found
+        last_image_number = image_numbers[-1] if image_numbers else 0
+                
         ## Set new image number
         image_number = last_image_number
-        
+
         # Open the video file
         vidcap = cv2.VideoCapture(os.path.join(video_output, f"video_{video_id}.mp4"))
 

@@ -20,9 +20,11 @@ def is_yt_dlp_installed():
 
 def download_video(url):
     try :
-         # Set up folder and file structure using absolute paths
-        base_dir = os.path.abspath(os.getcwd())
-        data_folder = os.path.join(base_dir, "data")
+        # Get the directory of the current script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Set up folder and file structure using absolute paths
+        data_folder = os.path.join(script_dir, "data")
         video_folder = os.path.join(data_folder, "videos")
 
         if not os.path.exists(data_folder):
@@ -32,13 +34,13 @@ def download_video(url):
             os.mkdir(video_folder)
 
         # Download video
-        video_output = os.path.join(os.getcwd(), "data", "videos")
+        video_output = os.path.join(script_dir, "data", "videos")
         command = [
             "yt-dlp",
             "--print-traffic",
             "--verbose",
-            "--output", f"{video_output}/video_%(id)s.%(ext)s", # This fixed the default naming conflict errors
-            "--no-part", # This fixed the .mp4.part issue
+            "--output", f"{video_output}/video_%(id)s.%(ext)s",
+            "--no-part",
             url
         ]
         subprocess.run(command)
