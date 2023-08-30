@@ -7,6 +7,8 @@ import multiprocessing
 from functools import partial
 
 def capture_images(url, capture_interval = 300):
+    # Delay for capture_interval seconds before starting the capture process
+    time.sleep(capture_interval)
     
     # Extract video_id from url
     parsed_url = urlparse(url)
