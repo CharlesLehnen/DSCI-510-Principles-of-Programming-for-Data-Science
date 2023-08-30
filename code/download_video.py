@@ -50,17 +50,25 @@ def download_video(url):
         download_process.terminate()
 
     
-if __name__ == "__main__":
+def main(urls=None):
     # Check if yt-dlp is installed
     if not is_yt_dlp_installed():
         print("Error: yt-dlp is not installed.")
         print("Please install it using: pip install yt-dlp")
         exit(1)
     
-    # Set the URLs of the YouTube live videos and run
-    urls = ["https://www.youtube.com/watch?v=ydYDqZQpim8", "https://www.youtube.com/watch?v=DsNtwGJXTTs"]
-    # Original link does not work right now: "https://www.youtube.com/watch?v=UeB6UcZpUzk", "https://www.youtube.com/watch?v=gUZjDCZEMDA"
-    
+    if not urls:
+        # Prompt the user for URLs or use default values
+        user_urls = input("Enter the YouTube video URLs separated by commas or press Enter to use default: ").strip()
+        if user_urls:
+            urls = [url.strip() for url in user_urls.split(",")]
+        else:
+            # Default URLs
+            urls = ["https://www.youtube.com/watch?v=ydYDqZQpim8"]
+
     # Run function
     with multiprocessing.Pool() as pool:
         pool.map(download_video, urls)
+
+if __name__ == "__main__":
+    main()

@@ -57,13 +57,25 @@ def capture_images(url, capture_interval = 300):
         print("Keyboard Interrupt")
 
 
-if __name__ == "__main__":
-    # Set the URLs of the YouTube live videos and run
-    urls = ["https://www.youtube.com/watch?v=ydYDqZQpim8", "https://www.youtube.com/watch?v=gUZjDCZEMDA"]
-    # Original link does not work right now: "https://www.youtube.com/watch?v=UeB6UcZpUzk"
-    
-    # Set interval between image captures
-    capture_interval = 300
-    
+def main(urls=None):
+    if not urls:
+        # Prompt the user for URLs or use default values
+        user_urls = input("Enter the YouTube video URLs separated by commas or press Enter to use default: ").strip()
+        if user_urls:
+            urls = [url.strip() for url in user_urls.split(",")]
+        else:
+            # Default URLs
+            urls = ["https://www.youtube.com/watch?v=ydYDqZQpim8"]
+
+    # Prompt the user for capture_interval or use default value
+    try:
+        user_interval = int(input(f"Enter the capture interval in seconds or press Enter to use default ({300} seconds): ").strip())
+        capture_interval = user_interval
+    except ValueError:
+        capture_interval = 300
+
     with multiprocessing.Pool() as pool:
-        pool.map(partial(capture_images, capture_interval = capture_interval), urls)
+        pool.map(partial(capture_images, capture_interval=capture_interval), urls)
+
+if __name__ == "__main__":
+    main()
