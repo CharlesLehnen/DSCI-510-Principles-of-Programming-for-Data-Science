@@ -27,6 +27,18 @@ def capture_images(url, capture_interval = 300):
 
         if not os.path.exists(image_folder):
             os.mkdir(image_folder)
+
+        # Check if video file exists and is accessible
+        max_retries = 10  # Maximum number of times to check for video file
+        retry_interval = 10  # Time (in seconds) to wait between checks
+        for _ in range(max_retries):
+            if os.path.exists(video_file_path) and os.access(video_file_path, os.R_OK):
+                break
+            print(f"Waiting for video file {video_file_path} to become available...")
+            time.sleep(retry_interval)
+        else:
+            print(f"Video file {video_file_path} not found or not accessible after {max_retries} retries.")
+            return
         
         # Code to start at image name that was left off at
         image_files = os.listdir(image_folder)
