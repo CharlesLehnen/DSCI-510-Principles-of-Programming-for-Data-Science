@@ -7,8 +7,6 @@ There was not yet a publicly available labelling dataset for African megafauna i
 3. Object detection of the presence of animals in captured images
 4. Cropping of images around individual animals
 5. Manually classifying of individual animals by species as a proof of concept for developing a custom classifier
-6. Preliminary analyses of the counts of individual animals at varying timepoints throughout the day
-
 
 # Dependencies
 
