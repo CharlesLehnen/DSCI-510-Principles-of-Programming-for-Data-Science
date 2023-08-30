@@ -61,4 +61,18 @@ Beyond my interest in this project as an important tool for my own doctoral rese
 
 It could feasibly be further developed to properly train a classifier of African wildlife following some further development and by running for long periods of time for multiple YouTube streams. 
 
-Additionally, I will also use this model in my own dissertation work to classify images of tortoises, iguanas, and no animals in order to make the analysis of camera trap data much more efficient.
+### Citation
+
+Please cite however you can if you use this script
+
+@misc{lehnen2022youtubetrailcam,
+  author = {Lehnen, Charles},
+  title = {YouTube_Trailcamera_Livestream_Classification_Tool},
+  year = {2022},
+  howpublished = {\url{https://github.com/CharlesLehnen/YouTube_Trailcamera_Livestream_Classification_Tool}}
+}
+
+## License
+
+This project is licensed under the BSD 3-Clause License - see the [LICENSE.md](LICENSE) file for details.
+
