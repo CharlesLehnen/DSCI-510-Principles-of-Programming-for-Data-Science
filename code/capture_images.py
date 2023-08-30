@@ -7,9 +7,7 @@ import multiprocessing
 from functools import partial
 
 def capture_images(url, capture_interval = 300):
-    # Delay for capture_interval seconds before starting the capture process
-    time.sleep(capture_interval)
-    
+
     # Extract video_id from url
     parsed_url = urlparse(url)
     video_id = parsed_url.query.split("&")[0].split("=")[1]
@@ -25,8 +23,8 @@ def capture_images(url, capture_interval = 300):
 
         # Set the output and image folders
         video_output = os.path.join(script_dir, "data", "videos")
-
         image_folder = os.path.join(script_dir, "data", "images")
+
         if not os.path.exists(image_folder):
             os.mkdir(image_folder)
         
@@ -42,6 +40,9 @@ def capture_images(url, capture_interval = 300):
                 
         ## Set new image number
         image_number = last_image_number
+
+        # Delay for capture_interval seconds before starting the capture process
+        time.sleep(capture_interval)
 
         # Open the video file
         vidcap = cv2.VideoCapture(os.path.join(video_output, f"video_{video_id}.mp4"))

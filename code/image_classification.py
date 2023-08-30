@@ -12,8 +12,11 @@ from matplotlib.pyplot import imshow
 from torchvision.transforms.functional import to_pil_image
 import string
 
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
 # Folder containing images to process
-image_dir = "data/images"
+image_dir = os.path.join(script_dir, "data", "images")
 
 # Folder for bounded images
 bounded_dir = os.path.join(image_dir, "bounded")
@@ -70,12 +73,14 @@ def separate_into_sets(image_dir):
     filenames = [filename for filename in filenames if not os.path.isdir(os.path.join(image_dir, filename))]
     random.shuffle(filenames)
 
+    # If there's only one image, place it in the training set
+    if len(filenames) == 1:
+        return filenames, [], []
+
     ## Randomly assign approximately 70% filenames to training, 20% to validation, and %10 to test
     train_filenames = filenames[:int(len(filenames) * 0.7)]
     valid_filenames = filenames[int(len(filenames) * 0.7):int(len(filenames) * 0.9)]
     test_filenames = filenames[int(len(filenames) * 0.9):]
-    
-    filename = None
     
     return train_filenames, valid_filenames, test_filenames
 

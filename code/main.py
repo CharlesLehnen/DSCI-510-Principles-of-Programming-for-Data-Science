@@ -40,4 +40,3 @@ if __name__ == "__main__":
         # Retrieve final results
         download_results = [result.get() for result in download_results]
         capture_results = [result.get() for result in capture_results]
-
